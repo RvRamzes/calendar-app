@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Календар</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Календар</h1>
+  <select id="month-select"></select>
+  <div id="calendar"></div>
+  <div>Загальний підсумок: <span id="selected-time">0</span>г</div>
+  <button onclick="exportStyledCalendar()">Експортувати в Excel</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

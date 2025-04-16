@@ -1,0 +1,80 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.calendar, .weekdays {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.week-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr) 150px;
+  gap: 6px;
+  margin-bottom: 6px;
+  align-items: center;
+}
+
+.day {
+  background: white;
+  border-radius: 8px;
+  padding: 12px 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.day:hover {
+  background-color: #e8f5e9;
+}
+
+.day.selected {
+  background-color: #4caf50;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.week-summary {
+  font-weight: bold;
+  background: #ffffff;
+  padding: 12px;
+  border-left: 4px solid #4caf50;
+  border-radius: 6px;
+  text-align: left;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.empty {
+  background: transparent;
+  pointer-events: none;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr) 150px;
+  gap: 6px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #555;
+}
+
+.summary {
+  font-size: 1.2em;
+  margin: 20px 0;
+}
