@@ -4,6 +4,10 @@ body {
   margin: 0;
   padding: 20px;
   text-align: center;
+/*Градієнтний фон (лайтовий вертикальний)*/
+ background: linear-gradient(to bottom, #f5f7fa, #e1e8ed);
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 h1 {
@@ -52,6 +56,7 @@ label {
 .week-summary {
   font-weight: bold;
   background: #ffffff;
+  width: 70px;
   padding: 12px;
   border-left: 4px solid #4caf50;
   border-radius: 6px;
