@@ -2,20 +2,54 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Щоб гарно відображалась на телефоні  -->
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Календар</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon-192.png" type="image/png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Календар</h1>
-  <select id="month-select"></select>
-  <div id="calendar"></div>
-  <div>Загальний підсумок: <span id="selected-time">0</span>г</div>
-  <button onclick="exportStyledCalendar()">Експортувати в Excel</button>
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
-  <script src="script.js"></script>
+<!-- Підключення бібліотеки SheetJS
+     для експорту даних в Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+
+<button onclick="exportCalendarLikeView()">Експортувати в Excel як календар</button>
+
+<h1>Графік годин за місяць</h1>
+
+<label for="month-select">Оберіть місяць:</label>
+<select id="month-select">
+  <option value="0">Січень</option>
+  <option value="1">Лютий</option>
+  <option value="2">Березень</option>
+  <option value="3">Квітень</option>
+  <option value="4">Травень</option>
+  <option value="5">Червень</option>
+  <option value="6">Липень</option>
+  <option value="7">Серпень</option>
+  <option value="8">Вересень</option>
+  <option value="9">Жовтень</option>
+  <option value="10">Листопад</option>
+  <option value="11">Грудень</option>
+</select>
+<div class="summary">
+  Загальна кількість: <span id="selected-time">0</span> годин
+</div>
+
+<div class="weekdays">
+  <div>Пн</div>
+  <div>Вт</div>
+  <div>Ср</div>
+  <div>Чт</div>
+  <div>Пт</div>
+  <div>Сб</div>
+  <div>Нд</div>
+  <div>Підсумок тижня</div> <!-- підсумок тижня -->
+</div>
+
+<div class="calendar" id="calendar"></div>
+
 </body>
 </html>
