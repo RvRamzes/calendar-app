@@ -13,7 +13,6 @@
 <body>  
 <h1>Графік годин за місяць</h1>
 <br> <!-- добавити відступ між рядками-->
-
 <label for="month-select">Оберіть місяць:</label>
 <select id="month-select">
   <option value="0">Січень</option>
@@ -41,11 +40,12 @@
   <div>Пт</div>
   <div>Сб</div>
   <div>Нд</div>
-  <div>Підсумок тижня</div> <!-- підсумок тижня -->
+  <div>За тиждень</div> <!-- Підсумок тижня -->
 </div>
   
 <div class="calendar" id="calendar"></div>
-<br> <!-- добавити відступ між рядками-->  
+<br> <!-- добавити відступ між рядками-->
+<button onclick="resetCalendar()">Скинути календар</button>
 <button onclick="exportCalendarLikeView()">Експортувати в Excel як календар</button>
 
 <!-- Підключення бібліотеки SheetJS для експорту даних в Excel -->
