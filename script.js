@@ -2,6 +2,10 @@ const calendar = document.getElementById('calendar');
 const summary = document.getElementById('selected-time');
 const monthSelect = document.getElementById('month-select');
 let daySelections = {};
+const saved = localStorage.getItem('daySelections');
+if (saved) {
+  daySelections = JSON.parse(saved);
+}
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth();
 
@@ -27,6 +31,9 @@ function createDayCell(day) {
     if (current === 0) daySelections[key] = 8;
     else if (current === 8) daySelections[key] = 11;
     else delete daySelections[key];
+
+// ⬇️ Ось цей рядок зберігає все
+localStorage.setItem('daySelections', JSON.stringify(daySelections));
 
     updateCalendar();
   };
@@ -174,4 +181,13 @@ function exportCalendarLikeView() {
 
   // Експортуємо в Excel
   XLSX.writeFile(wb, `Календар_${monthNames[currentMonth]}_${currentYear}.xlsx`);
+}
+
+///////Кнопка «Скинути все»///////////
+function resetCalendar() {
+  if (confirm("Очистити всі дані календаря?")) {
+    localStorage.removeItem('daySelections');
+    daySelections = {};
+    updateCalendar();
+  }
 }
