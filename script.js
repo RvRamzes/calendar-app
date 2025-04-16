@@ -25,7 +25,7 @@ function createDayCell(day) {
     const key = `${currentYear}-${currentMonth}-${day}`;
     const current = daySelections[key] || 0;
     if (current === 0) daySelections[key] = 8;
-    else if (current === 8) daySelections[key] = 10;
+    else if (current === 8) daySelections[key] = 11;
     else delete daySelections[key];
 
     updateCalendar();
@@ -95,8 +95,12 @@ function updateCalendar() {
     });
 
     const summaryCell = row.querySelector('.week-summary');
-    if (summaryCell) summaryCell.textContent = `Підсумок: ${weekTotal}г`;
+    if (summaryCell) summaryCell.textContent = `${weekTotal} годин`;
     total += weekTotal;
+    
+/// підсумки червоними, якщо за тиждень вийшло більше 40 годин///
+    summaryCell.classList.toggle('overload', weekTotal > 40);
+
   });
 
   summary.textContent = total;
@@ -115,26 +119,59 @@ generateCalendar();
 ////////////////////////////////////////////////////////
 /////////////Функція для експорту даних в Excel/////////
 ////////////////////////////////////////////////////////
-function exportToExcel() {
-  const wb = XLSX.utils.book_new(); // Створення нового файлу
+function exportCalendarLikeView() {
+  const wb = XLSX.utils.book_new();
   const sheetData = [];
 
-  // Додаємо заголовки
-  sheetData.push(['Рік', 'Місяць', 'День', 'Години']);
+  const monthNames = [
+    'Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень',
+    'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'
+  ];
+
+  // Додати заголовок місяця і року
+  sheetData.push([`${monthNames[currentMonth]} ${currentYear}`]);
+  sheetData.push([]); // порожній рядок
+
+  // Дні тижня
+  const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд', 'Підсумок:'];
+  sheetData.push(daysOfWeek);
+
+  const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+  let firstDay = new Date(currentYear, currentMonth, 1).getDay();
+  firstDay = firstDay === 0 ? 7 : firstDay;
+
+  let currentDay = 1;
+  let totalMonthHours = 0;
+
+  while (currentDay <= daysInMonth) {
+    const weekRow = new Array(8).fill('');
+    let weekTotal = 0;
 
   // Проходимо по всіх вибраних днях і додаємо їх у дані
-  for (const key in daySelections) {
-    if (daySelections.hasOwnProperty(key)) {
-      const [year, month, day] = key.split('-');
-      const hours = daySelections[key];
-      sheetData.push([year, parseInt(month) + 1, parseInt(day), hours]);
+    for (let i = firstDay - 1; i < 7 && currentDay <= daysInMonth; i++) {
+      const key = `${currentYear}-${currentMonth}-${currentDay}`;
+      const hours = daySelections[key] || 0;
+
+      weekRow[i] = hours ? `${currentDay} (${hours}г)` : `${currentDay}`;
+      weekTotal += hours;
+      totalMonthHours += hours;
+
+      currentDay++;
     }
+
+    weekRow[7] = `${weekTotal} годин`;
+    sheetData.push(weekRow);
+    firstDay = 1;
   }
+
+  // Додаємо загальний підсумок за місяць
+  sheetData.push([]);
+  sheetData.push(['Загальний підсумок за місяць:', `${totalMonthHours}г`]);
 
   // Створюємо лист з даними
   const ws = XLSX.utils.aoa_to_sheet(sheetData);
-  XLSX.utils.book_append_sheet(wb, ws, 'Дані');
+  XLSX.utils.book_append_sheet(wb, ws, 'Календар');
 
   // Експортуємо в Excel
-  XLSX.writeFile(wb, 'calendar_data.xlsx');
+  XLSX.writeFile(wb, `Календар_${monthNames[currentMonth]}_${currentYear}.xlsx`);
 }
