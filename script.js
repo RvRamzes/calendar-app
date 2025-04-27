@@ -29,7 +29,7 @@ function createDayCell(day) {
     const key = `${currentYear}-${currentMonth}-${day}`;
     const current = daySelections[key] || 0;
     if (current === 0) daySelections[key] = 10;
-    else if (current === 10) daySelections[key] = 20;
+    else if (current === 10) daySelections[key] = 8;
     else delete daySelections[key];
 
 // ⬇️ Ось цей рядок зберігає все
