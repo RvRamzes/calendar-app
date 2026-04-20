@@ -1,0 +1,225 @@
+/* ==================== КОЛЬОРИ ТА ЗАГАЛЬНІ ЗМІННІ ==================== */
+:root {
+  --seller: #4CAF50;   /* Фронтмен */
+  --loader: #A0522D;   /* Рухач */
+  --muted: #f5f5f5;    /* Фоновий колір сторінки */
+  --card: #ffffff;      /* Колір картки / клітинки календаря */
+  --accent: #2b6cb0;   /* Акцент для годин */
+  --danger: #c33;       /* Червоний для кнопок видалення */
+}
+
+* { box-sizing: border-box; }
+
+/* ==================== ТІЛО СТОРІНКИ ==================== */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 18px;
+  background: var(--muted);
+  color: #111;
+  text-align: center;
+}
+
+h1 { margin: 6px 0 12px; font-size: 20px; }
+
+/* ==================== ПАНЕЛІ КОНТРОЛЮ ==================== */
+.controls {
+  display:flex;
+  gap:18px;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-bottom: 12px;
+}
+
+.panel {
+  background: var(--card);
+  padding: 10px 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.panel .panel-title { font-weight:700; margin-right:6px; font-size:14px; }
+
+/* Чекбокс Біржа */
+.birzha-label { font-size:13px; margin-left:10px; cursor:pointer; }
+
+/* ==================== КНОПКИ ТИПУ ЗМІНИ ==================== */
+.role-buttons button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid #555;
+  background: none;
+  cursor: pointer;
+  font-weight:600;
+}
+
+.role-buttons button.active { color:#fff; border-color:transparent; }
+.role-seller.active { background: var(--seller); }
+.role-loader.active { background: var(--loader); color:#fff; }
+
+/* ==================== КНОПКИ ГОДИН ==================== */
+.hours-buttons button {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #888;
+  background: none;
+  cursor: pointer;
+  font-weight:600;
+}
+
+.hours-buttons button.active { 
+  background: var(--accent); 
+  color:#fff; 
+  border-color:transparent; 
+}
+
+/* Поле введення власних годин */
+#customHours {
+  width: 90px;
+  padding:6px 8px;
+  border-radius:8px;
+  border:1px solid #bbb;
+  text-align:center;
+}
+
+/* ==================== НАВІГАЦІЯ МІСЯЦІВ ==================== */
+.month-nav {
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  align-items:center;
+  margin: 12px 0;
+}
+
+.month-nav button { 
+  padding:6px 10px; 
+  border-radius:8px; 
+  cursor:pointer; 
+}
+
+/* Кнопка видалення місяця */
+.month-nav .danger { 
+  border: 1px solid var(--danger); 
+  color: var(--danger); 
+  background: #fff; 
+  font-weight:700; 
+}
+
+/* ==================== КАЛЕНДАР ==================== */
+.calendar {
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap:8px;
+  max-width:760px;
+  margin: 0 auto 12px;
+}
+
+/* Підписи днів тижня */
+.day-name {
+  font-weight:700;
+  padding:10px 6px;
+  border-radius:8px;
+  background:#e6e6e6;
+}
+
+/* Клітинки днів */
+.day {
+  min-height:72px;
+  background: var(--card);
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:8px;
+  text-align:left;
+  position:relative;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  gap:4px;
+}
+
+/* Порожні клітинки перед першим числом */
+.day.empty { background:transparent; border:none; cursor:default; }
+
+/* Ефект при наведенні */
+.day:hover { box-shadow:0 4px 10px rgba(0,0,0,0.06); }
+
+/* ==================== НОМЕР ДНЯ ==================== */
+.date-num { font-weight:700; font-size:14px; }
+
+/* ==================== БЕЙДЖІ ГОДИН І БІРЖІ ==================== */
+.hours-badge {
+  margin-top:auto;
+  align-self:flex-start;
+  padding:4px 6px;
+  border-radius:7px;
+  font-size:13px;
+  font-weight:700;
+  color:#fff;
+  background: linear-gradient(135deg, #2196F3, #21CBF3);
+}
+
+.birzha-badge {
+  font-size:11px;
+  padding:2px 4px;
+  border-radius:4px;
+  font-weight:700;
+  align-self:flex-start;
+  color:#000;
+  background: linear-gradient(135deg, #FFB74D, #FF9800);
+}
+
+/* ==================== КОЛЬОРИ ДЛЯ ТИПУ ЗМІНИ ==================== */
+.seller { background-color: var(--seller) !important; color:#fff; }
+.loader { background-color: var(--loader) !important; color:#fff; }
+
+/* Години всередині клітинки */
+.day.seller .hours-badge,
+.day.loader .hours-badge { 
+  background: rgba(255,255,255,0.18); 
+  color:#fff; 
+}
+
+/* ==================== ПІДСУМКИ МІСЯЦЯ ==================== */
+.summary-container {
+  max-width: 760px;
+  margin: 0 auto 36px;
+  display:flex;
+  justify-content:flex-end;
+  padding: 6px;
+}
+
+.summary-table {
+  border-collapse: collapse;
+  width: 320px;
+  background: var(--card);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.summary-table th,
+.summary-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-weight:600;
+}
+
+.summary-table thead th {
+  background: #f4f6f8;
+  font-weight:700;
+}
+
+/* Приховує нижню межу останнього рядка */
+.summary-table tbody tr:last-child td { border-bottom: none; }
+
+/* ==================== АДАПТИВ ==================== */
+@media (max-width:720px) {
+  .summary-container { justify-content:center; }
+  .summary-table { width: 100%; }
+}
