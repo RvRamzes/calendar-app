@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<nav style="background: #333; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000;">
+    <a href="index1.html" style="color: white; margin-right: 20px; text-decoration: none; font-family: sans-serif;">Сторінка 1</a>
+    <a href="index2.html" style="color: white; text-decoration: none; font-family: sans-serif;">Сторінка 2</a>
+</nav>
+
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Myprogram</title>
+    <link rel="stylesheet" href="./style2.css">
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="uk" >
+<head>
+  <meta charset="UTF-8">
+<!-- Щоб гарно відображалась на телефоні  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Календар</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link rel="stylesheet" href="style.css">
+</head>
+  
+<body>  
+<h1>Графік годин за місяць</h1>
+<br> <!-- добавити відступ між рядками-->
+<label for="month-select">Оберіть місяць:</label>
+<select id="month-select">
+  <option value="0">Січень</option>
+  <option value="1">Лютий</option>
+  <option value="2">Березень</option>
+  <option value="3">Квітень</option>
+  <option value="4">Травень</option>
+  <option value="5">Червень</option>
+  <option value="6">Липень</option>
+  <option value="7">Серпень</option>
+  <option value="8">Вересень</option>
+  <option value="9">Жовтень</option>
+  <option value="10">Листопад</option>
+  <option value="11">Грудень</option>
+</select>
+<div class="summary">
+  Загальна кількість: <span id="selected-time">0</span> годин
+</div>
+
+<div class="weekdays">
+  <div>Пн</div>
+  <div>Вт</div>
+  <div>Ср</div>
+  <div>Чт</div>
+  <div>Пт</div>
+  <div>Сб</div>
+  <div>Нд</div>
+  <div>За тиждень</div> <!-- Підсумок тижня -->
+</div>
+  
+<div class="calendar" id="calendar"></div>
+<br> <!-- добавити відступ між рядками-->
+<button onclick="resetCalendar()">Скинути календар</button>
+<button onclick="exportCalendarLikeView()">Експортувати в Excel як календар</button>
+
+<!-- Підключення бібліотеки SheetJS для експорту даних в Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+<script  src="./script2.js"></script>
+
+</body>
+</html>
+    <script  src="./script2.js"></script>
+
+  </body>
+  
+</html>
