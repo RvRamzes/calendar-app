@@ -1,101 +1,84 @@
 <!DOCTYPE html>
-
-<nav style="background: #333; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000;">
-    <a href="index1.html" style="color: white; margin-right: 20px; text-decoration: none; font-family: sans-serif;">Сторінка 1</a>
-    <a href="index2.html" style="color: white; text-decoration: none; font-family: sans-serif;">Сторінка 2</a>
-</nav>
-
-<html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <title>Home Старий ГПТ (Save)</title>
-    <link rel="stylesheet" href="./style1.css">
-
-  </head>
-    
-  <body>
-  <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Планувальник графіку</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Планувальник графіку</title>
+    <link rel="stylesheet" href="style1.css">
 </head>
 <body>
-  <h1>Планувальник графіку</h1>
 
-  <div class="controls">
-    <div class="panel role-panel">
-      <span class="panel-title">Тип зміни:</span>
-      <div class="role-buttons">
-        <button id="btnSeller" class="role-seller">Фронтмен</button>
-        <button id="btnLoader" class="role-loader">Рухач</button>
-      </div>
-      <label class="birzha-label">
-        <input type="checkbox" id="birzhaCheckbox"> Біржа
-      </label>
+    <nav style="background: #333; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000;">
+        <a href="index1.html" style="color: white; margin-right: 20px; text-decoration: none; font-family: sans-serif; font-weight: bold;">Сторінка 1</a>
+        <a href="index2.html" style="color: white; text-decoration: none; font-family: sans-serif;">Сторінка 2</a>
+    </nav>
+
+    <h1>Планувальник графіку</h1>
+
+    <div class="controls">
+        <div class="panel role-panel">
+            <span class="panel-title">Тип зміни:</span>
+            <div class="role-buttons">
+                <button id="btnSeller" class="role-seller">Фронтмен</button>
+                <button id="btnLoader" class="role-loader">Рухач</button>
+            </div>
+            <label class="birzha-label">
+                <input type="checkbox" id="birzhaCheckbox"> Біржа
+            </label>
+        </div>
+
+        <div class="panel hours-panel">
+            <span class="panel-title">Години:</span>
+            <div class="hours-buttons">
+                <button class="btnHour" data-hours="10">10 год</button>
+                <button class="btnHour" data-hours="9.5">9.5 год</button>
+            </div>
+            <input id="customHours" type="number" placeholder="власні (0.5)" step="0.5" min="0" />
+        </div>
     </div>
 
-    <div class="panel hours-panel">
-      <span class="panel-title">Години:</span>
-      <div class="hours-buttons">
-        <button class="btnHour" data-hours="10">10 год</button>
-        <button class="btnHour" data-hours="9.5">9.5 год</button>
-      </div>
-      <input id="customHours" type="number" placeholder="власні (0.5)" step="0.5" min="0" />
+    <div class="month-nav">
+        <button id="prevMonth">←</button>
+        <div id="monthLabel"></div>
+        <button id="nextMonth">→</button>
+        <button id="clearMonth" class="danger">Очистити місяць</button>
     </div>
-  </div>
 
-  <div class="month-nav">
-    <button id="prevMonth">←</button>
-    <div id="monthLabel"></div>
-    <button id="nextMonth">→</button>
-    <button id="clearMonth" class="danger">Очистити місяць</button>
-  </div>
+    <div class="calendar" id="calendar">
+        <div class="day-name">Пн</div>
+        <div class="day-name">Вт</div>
+        <div class="day-name">Ср</div>
+        <div class="day-name">Чт</div>
+        <div class="day-name">Пт</div>
+        <div class="day-name">Сб</div>
+        <div class="day-name">Нд</div>
+    </div>
 
-  <div class="calendar" id="calendar">
-    <div class="day-name">Пн</div>
-    <div class="day-name">Вт</div>
-    <div class="day-name">Ср</div>
-    <div class="day-name">Чт</div>
-    <div class="day-name">Пт</div>
-    <div class="day-name">Сб</div>
-    <div class="day-name">Нд</div>
-  </div>
+    <div class="summary-container" aria-live="polite">
+        <table id="summaryTable" class="summary-table">
+            <thead>
+                <tr>
+                    <th>Тип зміни</th>
+                    <th>Базові / Біржа / Всього (год)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Фронтмен</td>
+                    <td id="sumSeller">0 / 0 / 0</td>
+                </tr>
+                <tr>
+                    <td>Рухач</td>
+                    <td id="sumLoader">0 / 0 / 0</td>
+                </tr>
+                <tr>
+                    <td><strong>Усього</strong></td>
+                    <td id="sumTotal"><strong>0 / 0 / 0</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-  <!-- Підсумки за місяць -->
-  <div class="summary-container" aria-live="polite">
-    <table id="summaryTable" class="summary-table" role="table" aria-label="Підсумок годин за місяць">
-      <thead>
-        <tr>
-          <th>Тип зміни</th>
-          <th>Базові / Біржа / Всього (год)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Фронтмен</td>
-          <td id="sumSeller">0 / 0 / 0</td>
-        </tr>
-        <tr>
-          <td>Рухач</td>
-          <td id="sumLoader">0 / 0 / 0</td>
-        </tr>
-        <tr>
-          <td><strong>Усього</strong></td>
-          <td id="sumTotal"><strong>0 / 0 / 0</strong></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <script src="script1.js"></script>
+    <script src="script1.js"></script>
 </body>
-</html>
-    <script  src="./script1.js"></script>
-
-  </body>
-  
 </html>
