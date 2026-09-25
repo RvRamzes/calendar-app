@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Планувальник графіку</title>
+    
+    <!-- PWA Підключення -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-192.png" type="image/png">
+    
     <link rel="stylesheet" href="style1.css">
 </head>
 <body>
 
+    <!-- Навігація між сторінками -->
     <nav style="background: #333; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000;">
         <a href="index.html" style="color: white; margin-right: 20px; text-decoration: none; font-family: sans-serif; font-weight: bold;">Сторінка 1</a>
         <a href="index2.html" style="color: white; text-decoration: none; font-family: sans-serif;">Сторінка 2</a>
@@ -15,12 +21,13 @@
 
     <h1>Планувальник графіку</h1>
 
+    <!-- Панель керування (З Варіанта 1) -->
     <div class="controls">
         <div class="panel role-panel">
             <span class="panel-title">Тип зміни:</span>
             <div class="role-buttons">
-                <button id="btnSeller" class="role-seller">Фронтмен</button>
-                <button id="btnLoader" class="role-loader">Рухач</button>
+                <button id="btnSeller" class="role-seller">R. V.</button>
+                <button id="btnLoader" class="role-loader">D SkV</button>
             </div>
             <label class="birzha-label">
                 <input type="checkbox" id="birzhaCheckbox"> Біржа
@@ -37,13 +44,29 @@
         </div>
     </div>
 
+    <!-- Вибір місяця: Стрілочки + Select -->
     <div class="month-nav">
         <button id="prevMonth">←</button>
-        <div id="monthLabel"></div>
+        
+        <select id="monthSelect">
+            <option value="0">Січень</option>
+            <option value="1">Лютий</option>
+            <option value="2">Березень</option>
+            <option value="3">Квітень</option>
+            <option value="4">Травень</option>
+            <option value="5">Червень</option>
+            <option value="6">Липень</option>
+            <option value="7">Серпень</option>
+            <option value="8">Вересень</option>
+            <option value="9">Жовтень</option>a
+            <option value="10">Листопад</option>
+            <option value="11">Грудень</option>
+        </select>
+
         <button id="nextMonth">→</button>
-        <button id="clearMonth" class="danger">Очистити місяць</button>
     </div>
 
+    <!-- Календар: 8 колонок (Дні + За тиждень) -->
     <div class="calendar" id="calendar">
         <div class="day-name">Пн</div>
         <div class="day-name">Вт</div>
@@ -52,8 +75,10 @@
         <div class="day-name">Пт</div>
         <div class="day-name">Сб</div>
         <div class="day-name">Нд</div>
+        <div class="day-name week-summary-head">За тиждень</div>
     </div>
 
+    <!-- Детальна підсумкова таблиця -->
     <div class="summary-container" aria-live="polite">
         <table id="summaryTable" class="summary-table">
             <thead>
@@ -64,11 +89,11 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>Фронтмен</td>
+                    <td>R. V.</td>
                     <td id="sumSeller">0 / 0 / 0</td>
                 </tr>
                 <tr>
-                    <td>Рухач</td>
+                    <td>D SkV</td>
                     <td id="sumLoader">0 / 0 / 0</td>
                 </tr>
                 <tr>
@@ -79,6 +104,14 @@
         </table>
     </div>
 
+    <!-- Кнопки дій -->
+    <div class="actions">
+        <button id="exportExcel" class="secondary">Експортувати в Excel</button>
+        <button id="clearMonth" class="danger">Очистити місяць</button>
+    </div>
+
+    <!-- Бібліотека для Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
     <script src="script1.js"></script>
 </body>
 </html>
