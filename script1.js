@@ -16,10 +16,24 @@ let birzhaActive = false;
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth();
 
-const monthNames = ["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"];
+const monthNames = [
+  "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
+  "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"
+];
 
-// Збереження у форматі: { "YYYY-MM-DD": { role, hours, birzha } }
+// Структура збереження: { "YYYY-MM-DD": { firstAdded: 'seller'|'loader', seller: {...}, loader: {...} } }
 let savedData = JSON.parse(localStorage.getItem('workSchedule') || '{}');
+
+// Migrator: перетворення старого формату у новий з підтримкою firstAdded
+Object.keys(savedData).forEach(key => {
+  if (savedData[key] && savedData[key].role) {
+    const old = savedData[key];
+    savedData[key] = {
+      firstAdded: old.role,
+      [old.role]: { hours: old.hours, birzha: old.birzha }
+    };
+  }
+});
 
 // ==================== UTILITY FUNCTIONS ====================
 function formatKey(y, m, d) { 
@@ -34,11 +48,18 @@ function clearHourButtons() {
   hourButtons.forEach(b => b.classList.remove('active')); 
 }
 
+function setSafeText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
 // Значення за замовчуванням
-const DEFAULT_ROLE = 'loader', DEFAULT_HOURS = 9.5;
+const DEFAULT_ROLE = 'seller';
+const DEFAULT_HOURS = 11;
+
 function applyDefaults() {
   selectedRole = DEFAULT_ROLE;
-  btnLoader.classList.add('active');
+  if (btnSeller) btnSeller.classList.add('active');
 
   selectedHours = DEFAULT_HOURS;
   hourButtons.forEach(b => {
@@ -48,84 +69,119 @@ function applyDefaults() {
 applyDefaults();
 
 // ==================== EVENT LISTENERS ====================
-btnSeller.addEventListener('click', () => {
-  selectedRole = 'seller'; 
-  btnSeller.classList.add('active'); 
-  btnLoader.classList.remove('active'); 
-});
+if (btnSeller) {
+  btnSeller.addEventListener('click', () => {
+    selectedRole = 'seller'; 
+    btnSeller.classList.add('active'); 
+    if (btnLoader) btnLoader.classList.remove('active'); 
+  });
+}
 
-btnLoader.addEventListener('click', () => {
-  selectedRole = 'loader'; 
-  btnLoader.classList.add('active'); 
-  btnSeller.classList.remove('active'); 
-});
+if (btnLoader) {
+  btnLoader.addEventListener('click', () => {
+    selectedRole = 'loader'; 
+    btnLoader.classList.add('active'); 
+    if (btnSeller) btnSeller.classList.remove('active'); 
+  });
+}
 
 hourButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     selectedHours = Number(btn.dataset.hours);
     clearHourButtons(); 
     btn.classList.add('active'); 
-    customHoursInput.value = '';
+    if (customHoursInput) customHoursInput.value = '';
   });
 });
 
-customHoursInput.addEventListener('input', () => {
-  const v = parseFloat(customHoursInput.value); 
-  selectedHours = isNaN(v) ? null : v; 
-  clearHourButtons(); 
-});
+if (customHoursInput) {
+  customHoursInput.addEventListener('input', () => {
+    const v = parseFloat(customHoursInput.value); 
+    selectedHours = isNaN(v) ? null : v; 
+    clearHourButtons(); 
+  });
+}
 
-birzhaCheckbox.addEventListener('change', () => { 
-  birzhaActive = birzhaCheckbox.checked; 
-});
+if (birzhaCheckbox) {
+  birzhaCheckbox.addEventListener('change', () => { 
+    birzhaActive = birzhaCheckbox.checked; 
+  });
+}
 
 // Очистити місяць
-clearMonthBtn.addEventListener('click', () => {
-  const mm = String(currentMonth + 1).padStart(2, '0');
-  const prefix = `${currentYear}-${mm}-`;
-  const keys = Object.keys(savedData).filter(k => k.startsWith(prefix));
-  
-  if (keys.length === 0) { alert('Записів для цього місяця немає.'); return; }
-  if (!confirm(`Видалити всі записи за ${monthNames[currentMonth]} ${currentYear}?`)) return;
-  
-  keys.forEach(k => delete savedData[k]);
-  persist(); 
-  buildCalendar(currentYear, currentMonth);
-});
+if (clearMonthBtn) {
+  clearMonthBtn.addEventListener('click', () => {
+    const mm = String(currentMonth + 1).padStart(2, '0');
+    const prefix = `${currentYear}-${mm}-`;
+    const keys = Object.keys(savedData).filter(k => k.startsWith(prefix));
+    
+    if (keys.length === 0) { 
+      alert('Записів для цього місяця немає.'); 
+      return; 
+    }
+    
+    if (!confirm(`Видалити всі записи за ${monthNames[currentMonth]} ${currentYear}?`)) return;
+    
+    keys.forEach(k => delete savedData[k]);
+    persist(); 
+    buildCalendar(currentYear, currentMonth);
+  });
+}
 
-// Експорт в Excel
-exportExcelBtn.addEventListener('click', exportToExcel);
+if (exportExcelBtn) {
+  exportExcelBtn.addEventListener('click', exportToExcel);
+}
 
 // ==================== MONTHLY SUMMARY ====================
 function updateMonthlySummary() {
   const mm = String(currentMonth + 1).padStart(2, '0');
   const prefix = `${currentYear}-${mm}-`;
 
-  let sumSeller = { base: 0, birzha: 0 };
-  let sumLoader = { base: 0, birzha: 0 };
+  let sellerDays = 0, sellerBase = 0, sellerBirzha = 0;
+  let loaderDays = 0, loaderBase = 0, loaderBirzha = 0;
 
   for (const k in savedData) {
     if (!k.startsWith(prefix)) continue;
-    const e = savedData[k];
-    const hours = Number(e.hours) || 0;
-    
-    if (e.role === 'seller') { 
-      e.birzha ? sumSeller.birzha += hours : sumSeller.base += hours; 
-    } else if (e.role === 'loader') { 
-      e.birzha ? sumLoader.birzha += hours : sumLoader.base += hours; 
+    const dayEntry = savedData[k];
+    if (!dayEntry) continue;
+
+    if (dayEntry.seller) {
+      sellerDays++;
+      const h = Number(dayEntry.seller.hours) || 0;
+      dayEntry.seller.birzha ? sellerBirzha += h : sellerBase += h;
+    }
+
+    if (dayEntry.loader) {
+      loaderDays++;
+      const h = Number(dayEntry.loader.hours) || 0;
+      dayEntry.loader.birzha ? loaderBirzha += h : loaderBase += h;
     }
   }
 
-  document.getElementById('sumSeller').textContent = `${sumSeller.base} / ${sumSeller.birzha} / ${sumSeller.base + sumSeller.birzha}`;
-  document.getElementById('sumLoader').textContent = `${sumLoader.base} / ${sumLoader.birzha} / ${sumLoader.base + sumLoader.birzha}`;
-  document.getElementById('sumTotal').textContent = `${sumSeller.base + sumLoader.base} / ${sumSeller.birzha + sumLoader.birzha} / ${sumSeller.base + sumSeller.birzha + sumLoader.base + sumLoader.birzha}`;
+  // R. V. (seller)
+  setSafeText('sellerDays', sellerDays);
+  setSafeText('sellerBaseHours', `${sellerBase}г`);
+  setSafeText('sellerBirzhaHours', `${sellerBirzha}г`);
+  setSafeText('sellerTotalHours', `${sellerBase + sellerBirzha}г`);
+
+  // D SkV (loader)
+  setSafeText('loaderDays', loaderDays);
+  setSafeText('loaderBaseHours', `${loaderBase}г`);
+  setSafeText('loaderBirzhaHours', `${loaderBirzha}г`);
+  setSafeText('loaderTotalHours', `${loaderBase + loaderBirzha}г`);
+
+  // Усього
+  setSafeText('grandTotalDays', sellerDays + loaderDays);
+  setSafeText('grandBaseHours', `${sellerBase + loaderBase}г`);
+  setSafeText('grandBirzhaHours', `${sellerBirzha + loaderBirzha}г`);
+  setSafeText('grandTotalHours', `${sellerBase + sellerBirzha + loaderBase + loaderBirzha}г`);
 }
 
-// ==================== CALENDAR BUILDING (8 COLUMNS) ====================
+// ==================== CALENDAR BUILDING ====================
 function buildCalendar(y, m) {
-  monthSelect.value = m;
+  if (!calendar) return;
+  if (monthSelect) monthSelect.value = m;
 
-  // Очищення та створення заголовків сітки (8 колонок)
   calendar.innerHTML = `
     <div class="day-name">Пн</div>
     <div class="day-name">Вт</div>
@@ -139,24 +195,32 @@ function buildCalendar(y, m) {
 
   const daysInMonth = new Date(y, m + 1, 0).getDate();
   let firstDay = new Date(y, m, 1).getDay(); 
-  firstDay = (firstDay === 0) ? 7 : firstDay; // Неділя -> 7
+  firstDay = (firstDay === 0) ? 7 : firstDay;
 
   let currentDay = 1;
 
   while (currentDay <= daysInMonth) {
-    let weekHours = 0;
+    let sellerWeekHours = 0;
+    let loaderWeekHours = 0;
 
-    // Створення 7 днів тижня
     for (let i = 1; i <= 7; i++) {
       if ((currentDay === 1 && i < firstDay) || currentDay > daysInMonth) {
-        // Порожня клітинка
         const emptyCell = document.createElement('div');
         emptyCell.className = 'day empty';
         calendar.appendChild(emptyCell);
       } else {
-        // Клітинка з днем
         const dayDiv = document.createElement('div');
         dayDiv.className = 'day';
+
+        // Перевірка, чи є цей день сьогоднішнім
+        const today = new Date();
+        const isToday = (currentDay === today.getDate() && 
+                         m === today.getMonth() && 
+                         y === today.getFullYear());
+
+        if (isToday) {
+          dayDiv.classList.add('today');
+        }
 
         const num = document.createElement('div');
         num.className = 'date-num';
@@ -167,24 +231,54 @@ function buildCalendar(y, m) {
         const dayData = savedData[key];
 
         if (dayData) {
-          dayDiv.classList.add(dayData.role);
-          weekHours += Number(dayData.hours) || 0;
+          // --- ОБВОДКА: Задаємо клас обводки першого доданого працівника ---
+          if (dayData.firstAdded === 'seller' && dayData.seller) {
+            dayDiv.classList.add('has-seller');
+          } else if (dayData.firstAdded === 'loader' && dayData.loader) {
+            dayDiv.classList.add('has-loader');
+          } else if (dayData.seller) {
+            dayDiv.classList.add('has-seller');
+          } else if (dayData.loader) {
+            dayDiv.classList.add('has-loader');
+          }
 
-          if (dayData.birzha) {
+          const hoursContainer = document.createElement('div');
+          hoursContainer.className = 'hours-container';
+
+          let hasBirzha = false;
+
+          // Плашка для R. V. (Синя)
+          if (dayData.seller) {
+            sellerWeekHours += Number(dayData.seller.hours) || 0;
+            if (dayData.seller.birzha) hasBirzha = true;
+
+            const badge = document.createElement('div');
+            badge.className = 'hours-badge seller';
+            badge.textContent = `${dayData.seller.hours}г`;
+            hoursContainer.appendChild(badge);
+          }
+
+          // Плашка для D SkV (Оранжева)
+          if (dayData.loader) {
+            loaderWeekHours += Number(dayData.loader.hours) || 0;
+            if (dayData.loader.birzha) hasBirzha = true;
+
+            const loaderBadge = document.createElement('div');
+            loaderBadge.className = 'hours-badge loader';
+            loaderBadge.textContent = `${dayData.loader.hours}г`;
+            hoursContainer.appendChild(loaderBadge);
+          }
+
+          if (hasBirzha) {
             const bBadge = document.createElement('div');
             bBadge.className = 'birzha-badge';
             bBadge.textContent = 'Біржа';
             dayDiv.appendChild(bBadge);
           }
-          if (dayData.hours !== null) {
-            const hBadge = document.createElement('div');
-            hBadge.className = 'hours-badge';
-            hBadge.textContent = `${dayData.hours} год`;
-            dayDiv.appendChild(hBadge);
-          }
+
+          dayDiv.appendChild(hoursContainer);
         }
 
-        // Обробка кліку по дню
         const dayNum = currentDay;
         dayDiv.addEventListener('click', () => handleDayClick(key, dayNum));
 
@@ -193,29 +287,67 @@ function buildCalendar(y, m) {
       }
     }
 
-    // 8-ма колонка: Підсумок за тиждень
+    // --- ПІДСУМОК ЗА ТИЖДЕНЬ (РОЗДІЛЬНИЙ) ---
     const weekSummaryCell = document.createElement('div');
     weekSummaryCell.className = 'week-summary';
-    if (weekHours > 40) weekSummaryCell.classList.add('overload');
-    weekSummaryCell.textContent = `${weekHours}г`;
+
+    // Підсвічування червоним, якщо ХТОСЬ ОДИН перевищив норму (40 годин)
+    if (sellerWeekHours > 40 || loaderWeekHours > 40) {
+      weekSummaryCell.classList.add('overload');
+    }
+
+    if (sellerWeekHours === 0 && loaderWeekHours === 0) {
+      weekSummaryCell.innerHTML = `<span class="val-empty">0г</span>`;
+    } else {
+      weekSummaryCell.innerHTML = `
+        <span class="val-seller">${sellerWeekHours}г</span>
+        <span class="val-loader">${loaderWeekHours}г</span>
+      `;
+    }
+
     calendar.appendChild(weekSummaryCell);
   }
 
   updateMonthlySummary();
 }
 
-// Клік по дню (додавання / редагування / видалення)
+// Клік по дню (додавання/видалення ролі)
 function handleDayClick(key, day) {
   if (!selectedRole || selectedHours === null) return;
 
-  const existing = savedData[key];
+  if (!savedData[key]) {
+    savedData[key] = {};
+  }
 
-  // Якщо дані збігаються — видаляємо
-  if (existing && existing.role === selectedRole && Number(existing.hours) === Number(selectedHours) && existing.birzha === birzhaActive) {
-    delete savedData[key];
+  const dayEntry = savedData[key];
+  const existingRoleData = dayEntry[selectedRole];
+
+  // Якщо клікаємо повторно на того самого співробітника — видаляємо його зміну
+  if (existingRoleData && Number(existingRoleData.hours) === Number(selectedHours) && existingRoleData.birzha === birzhaActive) {
+    delete dayEntry[selectedRole];
+
+    // Переключаємо firstAdded на другого працівника, якщо першого видалено
+    if (dayEntry.firstAdded === selectedRole) {
+      const remainingRole = selectedRole === 'seller' ? 'loader' : 'seller';
+      if (dayEntry[remainingRole]) {
+        dayEntry.firstAdded = remainingRole;
+      } else {
+        delete dayEntry.firstAdded;
+      }
+    }
+
+    // Якщо день повністю порожній — видаляємо об'єкт дня
+    if (!dayEntry.seller && !dayEntry.loader) {
+      delete savedData[key];
+    }
   } else {
-    // Інакше — записуємо нові
-    savedData[key] = { role: selectedRole, hours: Number(selectedHours), birzha: birzhaActive };
+    // Якщо це перша зміна в день — записуємо ХТО її додав
+    if (!dayEntry.seller && !dayEntry.loader) {
+      dayEntry.firstAdded = selectedRole;
+    }
+
+    // Додаємо або оновлюємо зміну вибраного співробітника
+    dayEntry[selectedRole] = { hours: Number(selectedHours), birzha: birzhaActive };
   }
 
   persist();
@@ -223,22 +355,30 @@ function handleDayClick(key, day) {
 }
 
 // ==================== NAV LISTENERS ====================
-document.getElementById('prevMonth').addEventListener('click', () => {
-  currentMonth--; 
-  if (currentMonth < 0) { currentMonth = 11; currentYear--; } 
-  buildCalendar(currentYear, currentMonth); 
-});
+const prevBtn = document.getElementById('prevMonth');
+if (prevBtn) {
+  prevBtn.addEventListener('click', () => {
+    currentMonth--; 
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; } 
+    buildCalendar(currentYear, currentMonth); 
+  });
+}
 
-document.getElementById('nextMonth').addEventListener('click', () => {
-  currentMonth++; 
-  if (currentMonth > 11) { currentMonth = 0; currentYear++; } 
-  buildCalendar(currentYear, currentMonth); 
-});
+const nextBtn = document.getElementById('nextMonth');
+if (nextBtn) {
+  nextBtn.addEventListener('click', () => {
+    currentMonth++; 
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; } 
+    buildCalendar(currentYear, currentMonth); 
+  });
+}
 
-monthSelect.addEventListener('change', () => {
-  currentMonth = parseInt(monthSelect.value);
-  buildCalendar(currentYear, currentMonth);
-});
+if (monthSelect) {
+  monthSelect.addEventListener('change', () => {
+    currentMonth = parseInt(monthSelect.value);
+    buildCalendar(currentYear, currentMonth);
+  });
+}
 
 // ==================== EXPORT TO EXCEL ====================
 function exportToExcel() {
@@ -258,17 +398,24 @@ function exportToExcel() {
 
   while (currentDay <= daysInMonth) {
     const weekRow = new Array(8).fill('');
-    let weekTotal = 0;
+    let sellerWeekTotal = 0;
+    let loaderWeekTotal = 0;
 
     for (let i = firstDay - 1; i < 7 && currentDay <= daysInMonth; i++) {
       const key = formatKey(currentYear, currentMonth, currentDay);
       const entry = savedData[key];
 
       if (entry) {
-        const roleName = entry.role === 'seller' ? 'Фр' : 'Рух';
-        const birzhaText = entry.birzha ? ' (Б)' : '';
-        weekRow[i] = `${currentDay} [${roleName}${birzhaText} - ${entry.hours}г]`;
-        weekTotal += Number(entry.hours);
+        let textParts = [];
+        if (entry.seller) {
+          textParts.push(`R.V.${entry.seller.birzha ? '(Б)' : ''}-${entry.seller.hours}г`);
+          sellerWeekTotal += Number(entry.seller.hours);
+        }
+        if (entry.loader) {
+          textParts.push(`D.SkV${entry.loader.birzha ? '(Б)' : ''}-${entry.loader.hours}г`);
+          loaderWeekTotal += Number(entry.loader.hours);
+        }
+        weekRow[i] = `${currentDay} [${textParts.join(' + ')}]`;
       } else {
         weekRow[i] = `${currentDay}`;
       }
@@ -276,8 +423,8 @@ function exportToExcel() {
       currentDay++;
     }
 
-    weekRow[7] = `${weekTotal} год`;
-    totalMonthHours += weekTotal;
+    weekRow[7] = `R.V: ${sellerWeekTotal}г / D.SkV: ${loaderWeekTotal}г`;
+    totalMonthHours += (sellerWeekTotal + loaderWeekTotal);
     sheetData.push(weekRow);
     firstDay = 1;
   }
@@ -287,7 +434,7 @@ function exportToExcel() {
 
   const ws = XLSX.utils.aoa_to_sheet(sheetData);
   XLSX.utils.book_append_sheet(wb, ws, 'Графік');
-  XLSX.writeFile(wb, `График_${monthNames[currentMonth]}_${currentYear}.xlsx`);
+  XLSX.writeFile(wb, `Графік_${monthNames[currentMonth]}_${currentYear}.xlsx`);
 }
 
 // Запуск
