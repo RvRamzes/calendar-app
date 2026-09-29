@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Планувальник графіку</title>
+    <title>Чия Зміна?</title>
     
     <!-- PWA Підключення -->
     <link rel="manifest" href="manifest.json">
@@ -14,20 +14,20 @@
 <body>
 
     <!-- Навігація між сторінками -->
-    <nav style="background: #333; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000;">
-        <a href="index.html" style="color: white; margin-right: 20px; text-decoration: none; font-family: sans-serif; font-weight: bold;">Сторінка 1</a>
-        <a href="index2.html" style="color: white; text-decoration: none; font-family: sans-serif;">Сторінка 2</a>
+    <nav class="top-nav">
+        <a href="index.html" class="nav-link active">Сторінка 1</a>
+        <a href="index2.html" class="nav-link">Сторінка 2</a>
     </nav>
 
-    <h1>Планувальник графіку</h1>
+    <h1>Чия Зміна?</h1>
 
-    <!-- Панель керування (З Варіанта 1) -->
+    <!-- Панель керування (Вибір ролі та годин) -->
     <div class="controls">
         <div class="panel role-panel">
-            <span class="panel-title">Тип зміни:</span>
+            <span class="panel-title">Хто в ділі:</span>
             <div class="role-buttons">
-                <button id="btnSeller" class="role-seller">R. V.</button>
-                <button id="btnLoader" class="role-loader">D SkV</button>
+                <button id="btnSeller" class="role-seller">⚡ R. V.</button>
+                <button id="btnLoader" class="role-loader">🛡️ D SkV</button>
             </div>
             <label class="birzha-label">
                 <input type="checkbox" id="birzhaCheckbox"> Біржа
@@ -37,8 +37,8 @@
         <div class="panel hours-panel">
             <span class="panel-title">Години:</span>
             <div class="hours-buttons">
-                <button class="btnHour" data-hours="10">10 год</button>
-                <button class="btnHour" data-hours="9.5">9.5 год</button>
+                <button class="btnHour" data-hours="11">11 год</button>
+                <button class="btnHour" data-hours="8">8 год</button>
             </div>
             <input id="customHours" type="number" placeholder="власні (0.5)" step="0.5" min="0" />
         </div>
@@ -46,7 +46,7 @@
 
     <!-- Вибір місяця: Стрілочки + Select -->
     <div class="month-nav">
-        <button id="prevMonth">←</button>
+        <button id="prevMonth" aria-label="Попередній місяць">←</button>
         
         <select id="monthSelect">
             <option value="0">Січень</option>
@@ -58,49 +58,54 @@
             <option value="6">Липень</option>
             <option value="7">Серпень</option>
             <option value="8">Вересень</option>
-            <option value="9">Жовтень</option>a
+            <option value="9">Жовтень</option>
             <option value="10">Листопад</option>
             <option value="11">Грудень</option>
         </select>
 
-        <button id="nextMonth">→</button>
+        <button id="nextMonth" aria-label="Наступний місяць">→</button>
     </div>
 
-    <!-- Календар: 8 колонок (Дні + За тиждень) -->
-    <div class="calendar" id="calendar">
-        <div class="day-name">Пн</div>
-        <div class="day-name">Вт</div>
-        <div class="day-name">Ср</div>
-        <div class="day-name">Чт</div>
-        <div class="day-name">Пт</div>
-        <div class="day-name">Сб</div>
-        <div class="day-name">Нд</div>
-        <div class="day-name week-summary-head">За тиждень</div>
-    </div>
+    <!-- Календар: 8 колонок (Генерується динамічно через script1.js) -->
+    <div class="calendar" id="calendar"></div>
 
     <!-- Детальна підсумкова таблиця -->
-    <div class="summary-container" aria-live="polite">
-        <table id="summaryTable" class="summary-table">
+    <div class="summary-container">
+        <table class="summary-table">
             <thead>
                 <tr>
-                    <th>Тип зміни</th>
-                    <th>Базові / Біржа / Всього (год)</th>
+                    <th>Герої зміни</th>
+                    <th>Змін</th>
+                    <th>Базові</th>
+                    <th>Біржа</th>
+                    <th>Всього</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>R. V.</td>
-                    <td id="sumSeller">0 / 0 / 0</td>
+                    <td>⚡ R. V.</td>
+                    <td id="sellerDays" class="highlight-count">0</td>
+                    <td id="sellerBaseHours">0г</td>
+                    <td id="sellerBirzhaHours">0г</td>
+                    <td id="sellerTotalHours" class="total-val">0г</td>
                 </tr>
                 <tr>
-                    <td>D SkV</td>
-                    <td id="sumLoader">0 / 0 / 0</td>
-                </tr>
-                <tr>
-                    <td><strong>Усього</strong></td>
-                    <td id="sumTotal"><strong>0 / 0 / 0</strong></td>
+                    <td>🛡️ D SkV</td>
+                    <td id="loaderDays" class="highlight-count">0</td>
+                    <td id="loaderBaseHours">0г</td>
+                    <td id="loaderBirzhaHours">0г</td>
+                    <td id="loaderTotalHours" class="total-val">0г</td>
                 </tr>
             </tbody>
+            <tfoot>
+                <tr>
+                    <td><strong>Усього</strong></td>
+                    <td id="grandTotalDays" class="highlight-count"><strong>0</strong></td>
+                    <td id="grandBaseHours"><strong>0г</strong></td>
+                    <td id="grandBirzhaHours"><strong>0г</strong></td>
+                    <td id="grandTotalHours" class="total-val"><strong>0г</strong></td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 
@@ -110,7 +115,7 @@
         <button id="clearMonth" class="danger">Очистити місяць</button>
     </div>
 
-    <!-- Бібліотека для Excel -->
+    <!-- Підключення бібліотек та скриптів -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
     <script src="script1.js"></script>
 </body>
