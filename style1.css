@@ -1,16 +1,16 @@
 /* ==================== ТЕМНА ТЕМА WORKTIME ==================== */
 :root {
-  /* Синій (як "Магістр обліку") */
+  /* Синій (R. V.) */
   --seller: #3b82f6;        
   --seller-bg: rgba(37, 99, 235, 0.18); 
 
-  /* Оранжевий (як "Логіст") */
+  /* Оранжевий (D SkV) */
   --loader: #ea580c;        
   --loader-bg: rgba(234, 88, 12, 0.18); 
 
   /* Темний фон */
   --bg-color: #121212;      /* Темний фон сторінки */
-  --card-bg: #1e1e22;       /* Фон каток і панелей */
+  --card-bg: #1e1e22;       /* Фон карток і панелей */
   --card-border: #2e2e34;   /* Базова рамка */
   --text-main: #f3f4f6;     /* Світлий текст */
   
@@ -21,9 +21,16 @@
   --overload-bg: rgba(220, 38, 38, 0.18);
 }
 
-* { box-sizing: border-box; }
+* { 
+  box-sizing: border-box; 
+}
 
-/* ==================== ТІЛО СТОРІНКИ ==================== */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden; /* Запобігає появі горизонтальної прокрутки */
+}
+
+/* ==================== ТІЛО СТОРІНКИ ТА НАВІГАЦІЯ ==================== */
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   margin: 0;
@@ -31,6 +38,36 @@ body {
   background: var(--bg-color);
   color: var(--text-main);
   text-align: center;
+}
+
+/* Верхня навігація між сторінками */
+.top-nav {
+  background: #18181b;
+  padding: 12px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid #27272a;
+  width: calc(100% + 24px);
+  margin-left: -12px;
+  margin-right: -12px;
+  margin-top: -12px;
+  margin-bottom: 12px;
+}
+
+.nav-link {
+  color: #a1a1aa;
+  margin: 0 10px;
+  text-decoration: none;
+  font-family: inherit;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #ffffff;
 }
 
 h1 { 
@@ -67,6 +104,7 @@ h1 {
 }
 
 .birzha-label { 
+  accent-color: #eab308;
   font-size: 13px; 
   margin-left: 8px; 
   cursor: pointer; 
@@ -134,10 +172,12 @@ h1 {
   gap: 10px;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   margin: 14px 0;
 }
 
-.month-nav button, .month-nav select { 
+.month-nav button, 
+.month-nav select { 
   padding: 8px 12px; 
   border-radius: 8px; 
   border: 1px solid var(--card-border);
@@ -145,15 +185,28 @@ h1 {
   color: #fff;
   font-weight: 700;
   cursor: pointer; 
+  transition: all 0.2s ease;
+}
+
+.month-nav button:hover, 
+.month-nav select:hover {
+  border-color: #52525b;
 }
 
 /* ==================== 8-КОЛОНКОВИЙ КАЛЕНДАР ==================== */
 .calendar {
   display: grid;
-  grid-template-columns: repeat(7, 1fr) 1.1fr;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) minmax(0, 1.1fr);
   gap: 6px;
+  width: 100%;
   max-width: 860px;
   margin: 0 auto 16px;
+}
+
+/* Захист від розпирання вмістом */
+.day, .day-name, .week-summary {
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* Заголовки днів */
@@ -174,7 +227,7 @@ h1 {
 
 /* Клітинки днів */
 .day {
-  min-height: 72px;
+  min-height: 76px;
   background: var(--card-bg);
   border: 1.5px solid var(--card-border);
   border-radius: 10px;
@@ -205,63 +258,51 @@ h1 {
   color: #9ca3af;
 }
 
-/* --- ТІЛЬКИ ОБВОДКА ДЛЯ ЗМІН (БЕЗ ФОНУ) --- */
-
-/* Магістр обліку / Фронтмен (Синій) */
-.day.seller { 
-  background: var(--card-bg) !important; /* залишаємо стандартний темний фон клітинки */
+/* --- ОБВОДКИ ДНІВ --- */
+.day.has-seller { 
   border: 2px solid var(--seller) !important; 
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); /* легкий неоновий ефект навколо */
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
 }
-.day.seller .date-num { color: #60a5fa; }
-.day.seller .hours-badge {
-  background: #2563eb;
-  color: #ffffff;
-}
+.day.has-seller .date-num { color: #60a5fa; }
 
-/* Логіст / Рухач (Оранжевий) */
-.day.loader { 
-  background: var(--card-bg) !important; /* залишаємо стандартний темний фон клітинки */
+.day.has-loader { 
   border: 2px solid var(--loader) !important; 
-  box-shadow: 0 0 10px rgba(234, 88, 12, 0.2); /* легкий неоновий ефект навколо */
+  box-shadow: 0 0 8px rgba(234, 88, 12, 0.25);
 }
-.day.loader .date-num { color: #fb923c; }
-.day.loader .hours-badge {
-  background: #ea580c;
-  color: #ffffff;
-}
+.day.has-loader .date-num { color: #fb923c; }
 
-/* ==================== 8-МА КОЛОНКА "ЗА ТИЖДЕНЬ" ==================== */
-.week-summary {
-  background: var(--summary-bg);
-  border-radius: 10px;
-  border: 1px dashed #3f3f46;
+/* ==================== КОНТЕЙНЕР ТА БЕЙДЖІ ГОДИН ==================== */
+.hours-container {
   display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
-  color: #38bdf8;
-  min-height: 72px;
+  margin-top: auto;
 }
 
-.week-summary.overload {
-  background: var(--overload-bg);
-  color: #fca5a5;
-  border: 1.5px solid var(--danger);
-}
-
-/* ==================== БЕЙДЖІ ЗМІН ТА БІРЖІ ==================== */
 .hours-badge {
   font-size: 11px;
   padding: 3px 6px;
   border-radius: 6px;
   font-weight: 700;
-  background: #27272a;
-  color: #f4f4f5;
-  align-self: flex-start;
+  color: #ffffff;
+  display: inline-block;
+  white-space: nowrap;
 }
 
+/* Плашка R. V. (Синя) */
+.hours-badge.seller {
+  background: #2563eb !important;
+  border: 1px solid #60a5fa;
+}
+
+/* Плашка D SkV (Оранжева) */
+.hours-badge.loader {
+  background: #ea580c !important;
+  border: 1px solid #fb923c;
+}
+
+/* Позначка "Біржа" */
 .birzha-badge {
   font-size: 10px;
   padding: 2px 5px;
@@ -270,40 +311,117 @@ h1 {
   color: #000;
   background: #eab308;
   align-self: flex-start;
+  margin-bottom: 3px;
+}
+
+/* ==================== 8-МА КОЛОНКА "ЗА ТИЖДЕНЬ" ==================== */
+.week-summary {
+  background: var(--summary-bg);
+  border-radius: 10px;
+  border: 1px dashed #3f3f46;
+  min-height: 76px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px;
+  font-weight: 800;
+  font-size: 13px;
+  /* Лінія по діагоналі згори-зліва донизу-справа */
+  background-image: linear-gradient(to bottom right, transparent calc(50% - 1px), #3f3f46 50%, transparent calc(50% + 1px));
+}
+
+/* Години R. V. (зверху зліва) */
+.week-summary .val-seller {
+  align-self: flex-start;
+  color: #60a5fa;
+  text-shadow: 0 0 6px rgba(59, 130, 246, 0.4);
+  padding: 2px 0 0 4px;
+}
+
+/* Години D SkV (знизу справа) */
+.week-summary .val-loader {
+  align-self: flex-end;
+  color: #fb923c;
+  text-shadow: 0 0 6px rgba(234, 88, 12, 0.4);
+  padding: 0 4px 2px 0;
+}
+
+.week-summary .val-empty {
+  margin: auto;
+  color: #52525b;
+}
+
+/* Червона підсвітка при перевантаженні (понад 40г у когось одного) */
+.week-summary.overload {
+  background-color: var(--overload-bg);
+  border: 1.5px solid var(--danger);
+  background-image: linear-gradient(to bottom right, transparent calc(50% - 1px), rgba(220, 38, 38, 0.5) 50%, transparent calc(50% + 1px));
 }
 
 /* ==================== ПІДСУМКОВА ТАБЛИЦЯ ==================== */
 .summary-container {
   max-width: 860px;
-  margin: 20px auto;
+  margin: 24px auto;
   display: flex;
   justify-content: center;
+  padding: 0 10px;
 }
 
 .summary-table {
-  border-collapse: collapse;
   width: 100%;
-  max-width: 450px;
+  max-width: 680px;
+  border-collapse: collapse;
   background: var(--card-bg);
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--card-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-.summary-table th, .summary-table td {
-  padding: 10px 14px;
-  text-align: left;
+.summary-table th, 
+.summary-table td {
+  padding: 10px 12px;
+  text-align: center;
   border-bottom: 1px solid var(--card-border);
   font-size: 13px;
+  color: #f3f4f6;
+}
+
+.summary-table th:first-child, 
+.summary-table td:first-child {
+  text-align: left;
+  padding-left: 16px;
+  font-weight: 600;
 }
 
 .summary-table thead th {
   background: #18181b;
-  color: #71717a;
+  color: #9ca3af;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.summary-table td.highlight-count {
+  color: #38bdf8;
   font-weight: 700;
 }
 
-.summary-table tbody tr:last-child td { border-bottom: none; }
+.summary-table td.total-val {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.summary-table tfoot tr {
+  background: #18181b;
+}
+
+.summary-table tfoot td {
+  border-bottom: none;
+  font-size: 14px;
+}
 
 /* ==================== КНОПКИ ДІЙ ==================== */
 .actions {
@@ -322,17 +440,62 @@ h1 {
   transition: opacity 0.2s;
 }
 
-.actions button:hover { opacity: 0.85; }
+.actions button:hover { 
+  opacity: 0.85; 
+}
 
-.actions .secondary { background: #2563eb; color: #fff; }
-.actions .danger { background: var(--overload-bg); color: #fca5a5; border: 1px solid var(--danger); }
+.actions .secondary { 
+  background: #2563eb; 
+  color: #fff; 
+}
 
-/* ==================== АДАПТИВ ==================== */
+.actions .danger { 
+  background: var(--overload-bg); 
+  color: #fca5a5; 
+  border: 1px solid var(--danger); 
+}
+
+/* ==================== ПІДСВІЧУВАННЯ СЬОГОДНІШНЬОГО ДНЯ ==================== */
+.day.today {
+  background: rgba(255, 255, 255, 0.04) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.day.today .date-num {
+  color: #ffffff !important;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.day.today .date-num::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+}
+
+.day.today:not(.has-seller):not(.has-loader) {
+  border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+  animation: todayPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes todayPulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+/* ==================== АДАПТИВ (Мобільні пристрої) ==================== */
 @media (max-width: 650px) {
   body { padding: 6px; }
   .calendar { gap: 4px; }
-  .day { min-height: 60px; padding: 4px; }
+  .day { min-height: 64px; padding: 4px; }
   .hours-badge { font-size: 10px; padding: 2px 4px; }
   .date-num { font-size: 11px; }
-  .week-summary { font-size: 12px; min-height: 60px; }
+  .week-summary { font-size: 12px; min-height: 64px; }
 }
