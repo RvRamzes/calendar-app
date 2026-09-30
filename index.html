@@ -116,6 +116,46 @@
     </div>
 
     <!-- Підключення бібліотек та скриптів -->
+     <!-- Підключення Firebase SDK (v10 Modular) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { 
+    getFirestore, 
+    doc, 
+    getDoc, 
+    setDoc, 
+    onSnapshot,
+    enableIndexedDbPersistence 
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // Твої конфігураційні дані з Firebase Console
+const firebaseConfig = {
+  apiKey: "AIzaSyD6IXhEjnRlj5D7hEVi-33Hm16p_plcF2U",
+  authDomain: "worktimerv.firebaseapp.com",
+  projectId: "worktimerv",
+  storageBucket: "worktimerv.firebasestorage.app",
+  messagingSenderId: "1097943492918",
+  appId: "1:1097943492918:web:3d8ee7f9f11c1622c9eb97",
+  measurementId: "G-TSZ633RKTK"
+};
+
+  // Ініціалізація
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Вмикаємо офлайн-режим (робота без інтернету)
+  enableIndexedDbPersistence(db).catch((err) => {
+    console.log("Офлайн режим не розгортається:", err.code);
+  });
+
+  // Робимо Firestore доступним глобально для script1.js
+  window.db = db;
+  window.doc = doc;
+  window.setDoc = setDoc;
+  window.onSnapshot = onSnapshot;
+</script>
+
+    <!-- Підключення бібліотек та скриптів -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
     <script src="script1.js"></script>
 </body>
