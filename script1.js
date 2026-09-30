@@ -9,7 +9,7 @@ const birzhaCheckbox = document.getElementById('birzhaCheckbox');
 const clearMonthBtn = document.getElementById('clearMonth');
 const exportExcelBtn = document.getElementById('exportExcel');
 
-// ==================== GLOBAL VARIABLES ====================
+// ==================== GLOBAL VARIABLES & FIREBASE ====================
 let selectedRole = null;
 let selectedHours = null;
 let birzhaActive = false;
@@ -24,24 +24,52 @@ const monthNames = [
 // Структура збереження: { "YYYY-MM-DD": { firstAdded: 'seller'|'loader', seller: {...}, loader: {...} } }
 let savedData = JSON.parse(localStorage.getItem('workSchedule') || '{}');
 
-// Migrator: перетворення старого формату у новий з підтримкою firstAdded
-Object.keys(savedData).forEach(key => {
-  if (savedData[key] && savedData[key].role) {
-    const old = savedData[key];
-    savedData[key] = {
-      firstAdded: old.role,
-      [old.role]: { hours: old.hours, birzha: old.birzha }
-    };
+// Посилання на документ графіка у Firestore
+let scheduleDocRef = null;
+
+// Функція ініціалізації Firestore та Realtime Sync
+function initFirebaseSync() {
+  if (window.db && window.doc && window.onSnapshot) {
+    scheduleDocRef = window.doc(window.db, "schedules", "workSchedule");
+
+    // Слухач змін у реальному часі з Firebase
+    window.onSnapshot(scheduleDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        savedData = docSnap.data();
+        // Локальний бекап
+        localStorage.setItem('workSchedule', JSON.stringify(savedData));
+      } else {
+        // Якщо документ порожній у хмарі — створюємо його з локальних даних
+        if (Object.keys(savedData).length > 0) {
+          persist();
+        }
+      }
+      buildCalendar(currentYear, currentMonth);
+    }, (error) => {
+      console.error("Помилка синхронізації Firestore:", error);
+    });
+  } else {
+    // Якщо Firebase ще завантажується — повторити спробу через 300мс
+    setTimeout(initFirebaseSync, 300);
   }
-});
+}
 
 // ==================== UTILITY FUNCTIONS ====================
 function formatKey(y, m, d) { 
   return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 
-function persist() { 
+// Оновлена функція збереження у Firestore + localStorage
+async function persist() { 
   localStorage.setItem('workSchedule', JSON.stringify(savedData)); 
+
+  if (scheduleDocRef && window.setDoc) {
+    try {
+      await window.setDoc(scheduleDocRef, savedData);
+    } catch (e) {
+      console.error("Помилка збереження у Firestore:", e);
+    }
+  }
 }
 
 function clearHourButtons() { 
@@ -287,11 +315,10 @@ function buildCalendar(y, m) {
       }
     }
 
-    // --- ПІДСУМОК ЗА ТИЖДЕНЬ (РОЗДІЛЬНИЙ) ---
+    // --- ПІДСУМОК ЗА ТИЖДЕНЬ ---
     const weekSummaryCell = document.createElement('div');
     weekSummaryCell.className = 'week-summary';
 
-    // Підсвічування червоним, якщо ХТОСЬ ОДИН перевищив норму (40 годин)
     if (sellerWeekHours > 40 || loaderWeekHours > 40) {
       weekSummaryCell.classList.add('overload');
     }
@@ -326,7 +353,6 @@ function handleDayClick(key, day) {
   if (existingRoleData && Number(existingRoleData.hours) === Number(selectedHours) && existingRoleData.birzha === birzhaActive) {
     delete dayEntry[selectedRole];
 
-    // Переключаємо firstAdded на другого працівника, якщо першого видалено
     if (dayEntry.firstAdded === selectedRole) {
       const remainingRole = selectedRole === 'seller' ? 'loader' : 'seller';
       if (dayEntry[remainingRole]) {
@@ -336,17 +362,14 @@ function handleDayClick(key, day) {
       }
     }
 
-    // Якщо день повністю порожній — видаляємо об'єкт дня
     if (!dayEntry.seller && !dayEntry.loader) {
       delete savedData[key];
     }
   } else {
-    // Якщо це перша зміна в день — записуємо ХТО її додав
     if (!dayEntry.seller && !dayEntry.loader) {
       dayEntry.firstAdded = selectedRole;
     }
 
-    // Додаємо або оновлюємо зміну вибраного співробітника
     dayEntry[selectedRole] = { hours: Number(selectedHours), birzha: birzhaActive };
   }
 
@@ -437,5 +460,6 @@ function exportToExcel() {
   XLSX.writeFile(wb, `Графік_${monthNames[currentMonth]}_${currentYear}.xlsx`);
 }
 
-// Запуск
+// Запуск календаря та синхронізації
 buildCalendar(currentYear, currentMonth);
+initFirebaseSync();
