@@ -17,13 +17,23 @@
 
   <div class="max-w-2xl w-full mx-auto p-6 bg-slate-900 rounded-2xl shadow-xl border border-slate-800 space-y-6">
     
-    <!-- Заголовок -->
-    <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
-      <div class="p-2.5 bg-blue-600/20 text-blue-400 rounded-xl">📊</div>
-      <div>
-        <h2 class="text-xl font-bold">Розумний калькулятор ОВДП</h2>
-        <p class="text-xs text-slate-400">Автоматичний розрахунок із збереженням даних by R.V.</p>
+    <!-- Заголовок та кнопка скидання -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div class="flex items-center space-x-3">
+        <div class="p-2.5 bg-blue-600/20 text-blue-400 rounded-xl">📊</div>
+        <div>
+          <h2 class="text-xl font-bold">Розумний калькулятор ОВДП</h2>
+          <p class="text-xs text-slate-400">Автоматичний розрахунок із порівнянням до депозиту (податки 23%)</p>
+        </div>
       </div>
+      <button 
+        type="button" 
+        id="resetBtn"
+        class="px-3 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1"
+        title="Скинути налаштування за замовчуванням"
+      >
+        <span>🔄 Скинути</span>
+      </button>
     </div>
 
     <!-- БЛОК 1: ВХІДНІ ДАНІ ТА ВКЛАД -->
@@ -38,7 +48,7 @@
             id="budgetInput"
             type="number"
             step="100"
-            value="50000"
+            value="1028.93"
             class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-medium"
           />
         </div>
@@ -50,7 +60,7 @@
             id="bondsCount"
             type="number"
             min="1"
-            value="48"
+            value="1"
             class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-medium"
           />
         </div>
@@ -61,7 +71,7 @@
           <input
             id="buyPrice"
             type="number"
-            step="0.01"
+            step="0.4"
             value="1028.93"
             class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
           />
@@ -74,7 +84,7 @@
             id="holdingDays"
             type="number"
             min="1"
-            value="42"
+            value="30"
             class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
           />
         </div>
@@ -99,26 +109,26 @@
           />
         </div>
 
-        <!-- Ставка купона % (Зв'язана з НКД) -->
+        <!-- Ставка купона % -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Ставка купона (% річних)</label>
           <input
             id="couponRate"
             type="number"
             step="0.01"
-            value="15.30"
+            value="14.60"
             class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
           />
         </div>
 
-        <!-- Приріст НКД за день (Зв'язаний зі ставкою) -->
+        <!-- Приріст НКД за день -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Приріст НКД за день (грн)</label>
           <input
             id="dailyNkd"
             type="number"
             step="0.001"
-            value="0.419"
+            value="0.400"
             class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
           />
         </div>
@@ -190,26 +200,45 @@
       </div>
 
       <!-- Підсумкова картка прибутку -->
-      <div id="resultCard" class="p-4 rounded-xl border flex items-center justify-between bg-emerald-950/40 border-emerald-500/40 text-emerald-400 mt-4">
-        <div class="flex items-center space-x-3">
-          <span id="resultIcon" class="text-2xl">📈</span>
-          <div>
-            <div id="resultLabel" class="text-xs font-medium uppercase tracking-wider opacity-80">Чистий прибуток</div>
-            <div id="netProfit" class="text-2xl font-black">+0.00 грн</div>
+      <div id="resultCard" class="p-4 rounded-xl border flex flex-col space-y-3 bg-emerald-950/40 border-emerald-500/40 text-emerald-400 mt-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span id="resultIcon" class="text-2xl">📈</span>
+            <div>
+              <div id="resultLabel" class="text-xs font-medium uppercase tracking-wider opacity-80">Чистий прибуток</div>
+              <div id="netProfit" class="text-2xl font-black">+0.00 грн</div>
+            </div>
+          </div>
+
+          <div class="text-right">
+            <div class="text-xs opacity-80">За період (ROI)</div>
+            <div id="roiPercent" class="text-lg font-bold">+0.00%</div>
           </div>
         </div>
 
-        <div class="text-right">
-          <div class="text-xs opacity-80">Дохідність (ROI)</div>
-          <div id="roiPercent" class="text-lg font-bold">+0.00%</div>
+        <div class="pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs">
+          <div class="flex items-center space-x-1.5 text-emerald-300">
+            <span>🏦 Чисті річні (APY):</span>
+          </div>
+          <div id="annualizedRoi" class="font-bold text-sm text-emerald-300">+0.00% річних</div>
         </div>
       </div>
+
+      <!-- Блок динамічного порівняння з депозитом (податок 23%) -->
+      <div class="p-3 bg-blue-950/30 border border-blue-500/30 rounded-lg text-xs text-blue-300 space-y-1">
+        <div class="font-semibold flex items-center space-x-1">
+          <span>💡 Порівняння з банківським депозитом (податки 23%):</span>
+        </div>
+        <p id="depositComparisonText" class="opacity-90 leading-relaxed">
+          Оскільки дохід від ОВДП <strong>не оподатковується (0%)</strong>, щоб отримати такий самий чистий прибуток на класичному банківському депозиті (де стягується 23% податків: 18% ПДФО + 5% ВЗ), ставка по депозиту мала б складати не менше <strong id="equivalentDepositRate" class="text-amber-300">~0.00% річних</strong>.
+        </p>
+      </div>
+
     </div>
 
   </div>
 
   <script>
-    // Елементи форми
     const budgetInput = document.getElementById('budgetInput');
     const bondsCountInput = document.getElementById('bondsCount');
     const buyPriceInput = document.getElementById('buyPrice');
@@ -220,10 +249,28 @@
     const dailyNkdEl = document.getElementById('dailyNkd');
     const customFeePercentEl = document.getElementById('customFeePercent');
     const feeDescriptionEl = document.getElementById('feeDescription');
+    const resetBtn = document.getElementById('resetBtn');
 
-    const STORAGE_KEY = 'ovdp_calc_data_v2';
+    const STORAGE_KEY = 'ovdp_calc_data_v5';
 
-    // Збереження в LocalStorage
+    function getDefaultValues() {
+      const today = new Date();
+      const defaultSellDate = new Date();
+      defaultSellDate.setDate(today.getDate() + 30);
+      const formatDate = (date) => date.toISOString().split('T')[0];
+      return {
+        budget: "1028.93",
+        bondsCount: "1",
+        buyPrice: "1028.93",
+        holdingDays: "30",
+        buyDate: formatDate(today),
+        sellDate: formatDate(defaultSellDate),
+        couponRate: "14.60",
+        dailyNkd: "0.400",
+        feePercent: "0.00"
+      };
+    }
+
     function saveToStorage() {
       const data = {
         budget: budgetInput.value,
@@ -239,21 +286,20 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
-    // Завантаження з LocalStorage
     function loadFromStorage() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         try {
           const data = JSON.parse(saved);
-          if (data.budget) budgetInput.value = data.budget;
-          if (data.bondsCount) bondsCountInput.value = data.bondsCount;
-          if (data.buyPrice) buyPriceInput.value = data.buyPrice;
-          if (data.holdingDays) holdingDaysEl.value = data.holdingDays;
-          if (data.buyDate) buyDateEl.value = data.buyDate;
-          if (data.sellDate) sellDateEl.value = data.sellDate;
-          if (data.couponRate) couponRateEl.value = data.couponRate;
-          if (data.dailyNkd) dailyNkdEl.value = data.dailyNkd;
-          if (data.feePercent) customFeePercentEl.value = data.feePercent;
+          if (data.budget !== undefined) budgetInput.value = data.budget;
+          if (data.bondsCount !== undefined) bondsCountInput.value = data.bondsCount;
+          if (data.buyPrice !== undefined) buyPriceInput.value = data.buyPrice;
+          if (data.holdingDays !== undefined) holdingDaysEl.value = data.holdingDays;
+          if (data.buyDate !== undefined) buyDateEl.value = data.buyDate;
+          if (data.sellDate !== undefined) sellDateEl.value = data.sellDate;
+          if (data.couponRate !== undefined) couponRateEl.value = data.couponRate;
+          if (data.dailyNkd !== undefined) dailyNkdEl.value = data.dailyNkd;
+          if (data.feePercent !== undefined) customFeePercentEl.value = data.feePercent;
           return true;
         } catch(e) {
           console.error(e);
@@ -262,17 +308,41 @@
       return false;
     }
 
-    // Ініціалізація дат, якщо немає збережених
     if (!loadFromStorage()) {
-      const today = new Date();
-      const defaultSellDate = new Date();
-      defaultSellDate.setDate(today.getDate() + 42);
-      const formatDate = (date) => date.toISOString().split('T')[0];
-      buyDateEl.value = formatDate(today);
-      sellDateEl.value = formatDate(defaultSellDate);
+      const defaults = getDefaultValues();
+      budgetInput.value = defaults.budget;
+      bondsCountInput.value = defaults.bondsCount;
+      buyPriceInput.value = defaults.buyPrice;
+      holdingDaysEl.value = defaults.holdingDays;
+      buyDateEl.value = defaults.buyDate;
+      sellDateEl.value = defaults.sellDate;
+      couponRateEl.value = defaults.couponRate;
+      dailyNkdEl.value = defaults.dailyNkd;
+      customFeePercentEl.value = defaults.feePercent;
     }
 
-    // Логіка комісій
+    resetBtn.addEventListener('click', () => {
+      localStorage.removeItem(STORAGE_KEY);
+      
+      const defaults = getDefaultValues();
+      budgetInput.value = defaults.budget;
+      bondsCountInput.value = defaults.bondsCount;
+      buyPriceInput.value = defaults.buyPrice;
+      holdingDaysEl.value = defaults.holdingDays;
+      buyDateEl.value = defaults.buyDate;
+      sellDateEl.value = defaults.sellDate;
+      couponRateEl.value = defaults.couponRate;
+      dailyNkdEl.value = defaults.dailyNkd;
+      customFeePercentEl.value = defaults.feePercent;
+      feeDescriptionEl.textContent = "Оберіть джерело або введіть комісію вручну.";
+
+      feeButtons.forEach(b => {
+        b.className = 'fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400';
+      });
+
+      calculateFromBudget();
+    });
+
     const feePresets = {
       debit: { percent: 0.00, desc: 'Власні кошти без комісії.' },
       credit: { percent: 3.50, desc: 'Комісія ПриватБанку за використання кредитного ліміту.' },
@@ -295,11 +365,8 @@
       });
     });
 
-    customFeePercentEl.addEventListener('input', () => {
-      calculateFromBudget();
-    });
+    customFeePercentEl.addEventListener('input', () => calculateFromBudget());
 
-    // Двостороння синхронізація дат і днів
     function updateDaysFromDates() {
       const buy = new Date(buyDateEl.value);
       const sell = new Date(sellDateEl.value);
@@ -322,7 +389,6 @@
       calculateFromBudget();
     }
 
-    // Двостороння синхронізація Ставка купона ⇄ НКД за день
     let isRateUpdating = false;
 
     couponRateEl.addEventListener('input', () => {
@@ -364,9 +430,13 @@
       if (costPerBondWithFee > 0) {
         count = Math.floor(budget / costPerBondWithFee);
       }
-      bondsCountInput.value = count;
+      // Якщо бюджет менший за вартість 1 шт, але поле бюджету активно, мінімум ставимо 1 або залежно від логіки (якщо користувач навмисно зменшив)
+      if (count < 1 && budget > 0 && bondsCountInput.value == "1") {
+        count = 1;
+      }
+      bondsCountInput.value = count > 0 ? count : 1;
 
-      updateFinalResults(count, budget);
+      updateFinalResults(parseInt(bondsCountInput.value) || 1, budget);
       saveToStorage();
       isUpdating = false;
     }
@@ -410,7 +480,11 @@
       const netProfit = totalSellRevenue - totalExpenses;
       const roiPercent = totalExpenses > 0 ? (netProfit / totalExpenses) * 100 : 0;
 
-      // Оновлення DOM
+      const annualizedRoi = days > 0 ? roiPercent * (365 / days) : 0;
+      
+      const depositTaxRate = 0.23; // 18% ПДФО + 5% ВЗ
+      const equivalentDepositRate = annualizedRoi > 0 ? (annualizedRoi / (1 - depositTaxRate)) : 0;
+
       document.getElementById('unspentAmount').textContent = unspent.toFixed(2) + ' грн';
       document.getElementById('rawPurchaseTotal').textContent = rawPurchaseTotal.toFixed(2) + ' грн';
       document.getElementById('feeLabelText').textContent = `Комісія (${feePercent}%):`;
@@ -424,23 +498,28 @@
       const resultLabel = document.getElementById('resultLabel');
       const netProfitEl = document.getElementById('netProfit');
       const roiPercentEl = document.getElementById('roiPercent');
+      const annualizedRoiEl = document.getElementById('annualizedRoi');
+      const equivalentDepositRateEl = document.getElementById('equivalentDepositRate');
+
+      equivalentDepositRateEl.textContent = '~' + equivalentDepositRate.toFixed(2) + '% річних';
 
       if (netProfit >= 0) {
-        resultCard.className = 'p-4 rounded-xl border flex items-center justify-between bg-emerald-950/40 border-emerald-500/40 text-emerald-400 mt-4';
+        resultCard.className = 'p-4 rounded-xl border flex flex-col space-y-3 bg-emerald-950/40 border-emerald-500/40 text-emerald-400 mt-4';
         resultIcon.textContent = '📈';
         resultLabel.textContent = 'Чистий прибуток';
         netProfitEl.textContent = '+' + netProfit.toFixed(2) + ' грн';
         roiPercentEl.textContent = '+' + roiPercent.toFixed(2) + '%';
+        annualizedRoiEl.textContent = '+' + annualizedRoi.toFixed(2) + '% річних';
       } else {
-        resultCard.className = 'p-4 rounded-xl border flex items-center justify-between bg-rose-950/40 border-rose-500/40 text-rose-400 mt-4';
+        resultCard.className = 'p-4 rounded-xl border flex flex-col space-y-3 bg-rose-950/40 border-rose-500/40 text-rose-400 mt-4';
         resultIcon.textContent = '⚠️';
         resultLabel.textContent = 'Чистий збиток';
         netProfitEl.textContent = netProfit.toFixed(2) + ' грн';
         roiPercentEl.textContent = roiPercent.toFixed(2) + '%';
+        annualizedRoiEl.textContent = annualizedRoi.toFixed(2) + '% річних';
       }
     }
 
-    // Первинний запуск
     calculateFromBudget();
   </script>
 </body>
