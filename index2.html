@@ -1,66 +1,447 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Графік годин за місяць</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icon-192.png" type="image/png">
-    
-    <link rel="stylesheet" href="style2.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор ОВДП</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 flex flex-col items-center">
 
-    <nav style="background: #333; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 1000;">
-        <a href="index.html" style="color: white; margin-right: 20px; text-decoration: none; font-family: sans-serif;">Сторінка 1</a>
-        <a href="index2.html" style="color: white; text-decoration: none; font-family: sans-serif; font-weight: bold;">Сторінка 2</a>
-    </nav>
+  <!-- Навігація між сторінками -->
+  <nav class="top-nav w-full max-w-2xl flex space-x-4 mb-6 bg-slate-900 p-3 rounded-xl border border-slate-800">
+    <a href="index.html" class="nav-link px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-white transition-all">Сторінка 1</a>
+    <a href="index2.html" class="nav-link active px-4 py-2 rounded-lg text-sm bg-blue-600 text-white font-semibold shadow">Сторінка 2 (Калькулятор)</a>
+  </nav>
 
-    <h1>Графік годин за місяць</h1>
+  <div class="max-w-2xl w-full mx-auto p-6 bg-slate-900 rounded-2xl shadow-xl border border-slate-800 space-y-6">
     
-    <br> 
-
-    <label for="month-select">Оберіть місяць:</label>
-    <select id="month-select">
-        <option value="0">Січень</option>
-        <option value="1">Лютий</option>
-        <option value="2">Березень</option>
-        <option value="3">Квітень</option>
-        <option value="4">Травень</option>
-        <option value="5">Червень</option>
-        <option value="6">Липень</option>
-        <option value="7">Серпень</option>
-        <option value="8">Вересень</option>
-        <option value="9">Жовтень</option>
-        <option value="10">Листопад</option>
-        <option value="11">Грудень</option>
-    </select>
-
-    <div class="summary">
-        Загальна кількість: <span id="selected-time">0</span> годин
+    <!-- Заголовок -->
+    <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+      <div class="p-2.5 bg-blue-600/20 text-blue-400 rounded-xl">📊</div>
+      <div>
+        <h2 class="text-xl font-bold">Розумний калькулятор ОВДП</h2>
+        <p class="text-xs text-slate-400">Автоматичний розрахунок із збереженням даних by R.V.</p>
+      </div>
     </div>
 
-    <div class="weekdays">
-        <div>Пн</div>
-        <div>Вт</div>
-        <div>Ср</div>
-        <div>Чт</div>
-        <div>Пт</div>
-        <div>Сб</div>
-        <div>Нд</div>
-        <div>За тиждень</div> 
+    <!-- БЛОК 1: ВХІДНІ ДАНІ ТА ВКЛАД -->
+    <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800 space-y-4">
+      <div class="text-xs font-semibold text-blue-400 uppercase tracking-wider">📥 1. Вклад та параметри угоди</div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Доступна сума (Бюджет) -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Бажана сума вкладу (грн)</label>
+          <input
+            id="budgetInput"
+            type="number"
+            step="100"
+            value="50000"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-medium"
+          />
+        </div>
+
+        <!-- Кількість облігацій (синхронізується) -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Кількість ОВДП (шт)</label>
+          <input
+            id="bondsCount"
+            type="number"
+            min="1"
+            value="48"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-medium"
+          />
+        </div>
+
+        <!-- Ціна купівлі -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Ціна купівлі 1 шт (грн)</label>
+          <input
+            id="buyPrice"
+            type="number"
+            step="0.01"
+            value="1028.93"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <!-- Днів утримання -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Днів утримання (до продажу)</label>
+          <input
+            id="holdingDays"
+            type="number"
+            min="1"
+            value="42"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <!-- Дата купівлі -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Дата купівлі</label>
+          <input
+            id="buyDate"
+            type="date"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <!-- Дата продажу -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Дата продажу / погашення</label>
+          <input
+            id="sellDate"
+            type="date"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <!-- Ставка купона % (Зв'язана з НКД) -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Ставка купона (% річних)</label>
+          <input
+            id="couponRate"
+            type="number"
+            step="0.01"
+            value="15.30"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <!-- Приріст НКД за день (Зв'язаний зі ставкою) -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Приріст НКД за день (грн)</label>
+          <input
+            id="dailyNkd"
+            type="number"
+            step="0.001"
+            value="0.419"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+          />
+        </div>
+      </div>
+
+      <!-- Вибір джерела коштів та комісій -->
+      <div class="pt-2 border-t border-slate-800">
+        <label class="block text-xs text-slate-400 mb-2">Джерело коштів та комісія</label>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+          <button type="button" data-type="debit" class="fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">
+            💳 Власні (0%)
+          </button>
+          <button type="button" data-type="credit" class="fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">
+            🏦 Кредитка (3.5%)
+          </button>
+          <button type="button" data-type="icu" class="fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">
+            🏛️ ICU (0.15%)
+          </button>
+          <button type="button" data-type="diia" class="fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">
+            📱 Дія (0.2%)
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-xs">
+          <span id="feeDescription" class="text-slate-400">Оберіть джерело або введіть комісію вручну.</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-slate-400">Ставка (%):</span>
+            <input
+              id="customFeePercent"
+              type="number"
+              step="0.01"
+              value="0.00"
+              class="w-16 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white text-right focus:outline-none focus:border-blue-500"
+            />
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="calendar" id="calendar"></div>
-    
-    <br> 
+    <!-- БЛОК 2: РОЗРАХУНОК ТА ДОХІД -->
+    <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-4">
+      <div class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">📊 2. Деталізація та фінансовий результат</div>
 
-    <button onclick="resetCalendar()">Скинути календар</button>
-    <button onclick="exportCalendarLikeView()">Експортувати в Excel як календар</button>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between text-amber-400 font-medium">
+          <span>Невикористаний залишок (готівка):</span>
+          <span id="unspentAmount">0.00 грн</span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+          <span>Чиста вартість облігацій:</span>
+          <span id="rawPurchaseTotal">0.00 грн</span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+          <span id="feeLabelText">Комісія:</span>
+          <span id="calculatedFee">0.00 грн</span>
+        </div>
+        <div class="flex justify-between text-slate-300 border-t border-slate-800 pt-2 font-medium">
+          <span>Загальні витрати на купівлю:</span>
+          <span id="totalExpenses">0.00 грн</span>
+        </div>
+        <div class="flex justify-between text-slate-300">
+          <span>Очікувана ціна продажу (1 шт):</span>
+          <span id="expectedSellPrice">0.00 грн</span>
+        </div>
+        <div class="flex justify-between text-slate-300">
+          <span>Сума при продажу / виплаті:</span>
+          <span id="totalSellRevenue">0.00 грн</span>
+        </div>
+      </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
-    <script src="script2.js"></script>
+      <!-- Підсумкова картка прибутку -->
+      <div id="resultCard" class="p-4 rounded-xl border flex items-center justify-between bg-emerald-950/40 border-emerald-500/40 text-emerald-400 mt-4">
+        <div class="flex items-center space-x-3">
+          <span id="resultIcon" class="text-2xl">📈</span>
+          <div>
+            <div id="resultLabel" class="text-xs font-medium uppercase tracking-wider opacity-80">Чистий прибуток</div>
+            <div id="netProfit" class="text-2xl font-black">+0.00 грн</div>
+          </div>
+        </div>
 
+        <div class="text-right">
+          <div class="text-xs opacity-80">Дохідність (ROI)</div>
+          <div id="roiPercent" class="text-lg font-bold">+0.00%</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Елементи форми
+    const budgetInput = document.getElementById('budgetInput');
+    const bondsCountInput = document.getElementById('bondsCount');
+    const buyPriceInput = document.getElementById('buyPrice');
+    const holdingDaysEl = document.getElementById('holdingDays');
+    const buyDateEl = document.getElementById('buyDate');
+    const sellDateEl = document.getElementById('sellDate');
+    const couponRateEl = document.getElementById('couponRate');
+    const dailyNkdEl = document.getElementById('dailyNkd');
+    const customFeePercentEl = document.getElementById('customFeePercent');
+    const feeDescriptionEl = document.getElementById('feeDescription');
+
+    const STORAGE_KEY = 'ovdp_calc_data_v2';
+
+    // Збереження в LocalStorage
+    function saveToStorage() {
+      const data = {
+        budget: budgetInput.value,
+        bondsCount: bondsCountInput.value,
+        buyPrice: buyPriceInput.value,
+        holdingDays: holdingDaysEl.value,
+        buyDate: buyDateEl.value,
+        sellDate: sellDateEl.value,
+        couponRate: couponRateEl.value,
+        dailyNkd: dailyNkdEl.value,
+        feePercent: customFeePercentEl.value
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // Завантаження з LocalStorage
+    function loadFromStorage() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (data.budget) budgetInput.value = data.budget;
+          if (data.bondsCount) bondsCountInput.value = data.bondsCount;
+          if (data.buyPrice) buyPriceInput.value = data.buyPrice;
+          if (data.holdingDays) holdingDaysEl.value = data.holdingDays;
+          if (data.buyDate) buyDateEl.value = data.buyDate;
+          if (data.sellDate) sellDateEl.value = data.sellDate;
+          if (data.couponRate) couponRateEl.value = data.couponRate;
+          if (data.dailyNkd) dailyNkdEl.value = data.dailyNkd;
+          if (data.feePercent) customFeePercentEl.value = data.feePercent;
+          return true;
+        } catch(e) {
+          console.error(e);
+        }
+      }
+      return false;
+    }
+
+    // Ініціалізація дат, якщо немає збережених
+    if (!loadFromStorage()) {
+      const today = new Date();
+      const defaultSellDate = new Date();
+      defaultSellDate.setDate(today.getDate() + 42);
+      const formatDate = (date) => date.toISOString().split('T')[0];
+      buyDateEl.value = formatDate(today);
+      sellDateEl.value = formatDate(defaultSellDate);
+    }
+
+    // Логіка комісій
+    const feePresets = {
+      debit: { percent: 0.00, desc: 'Власні кошти без комісії.' },
+      credit: { percent: 3.50, desc: 'Комісія ПриватБанку за використання кредитного ліміту.' },
+      icu: { percent: 0.15, desc: 'Стандартна брокерська комісія ICU Trade.' },
+      diia: { percent: 0.20, desc: 'Комісія при купівлі через державний застосунок Дія.' }
+    };
+
+    const feeButtons = document.querySelectorAll('.fee-btn');
+    feeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        feeButtons.forEach(b => {
+          b.className = 'fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400';
+        });
+        btn.className = 'fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-blue-600/25 border-blue-500 text-blue-400';
+        
+        const type = btn.getAttribute('data-type');
+        customFeePercentEl.value = feePresets[type].percent;
+        feeDescriptionEl.textContent = feePresets[type].desc;
+        calculateFromBudget();
+      });
+    });
+
+    customFeePercentEl.addEventListener('input', () => {
+      calculateFromBudget();
+    });
+
+    // Двостороння синхронізація дат і днів
+    function updateDaysFromDates() {
+      const buy = new Date(buyDateEl.value);
+      const sell = new Date(sellDateEl.value);
+      const diffTime = sell - buy;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (!isNaN(diffDays) && diffDays >= 0) {
+        holdingDaysEl.value = diffDays;
+      }
+      calculateFromBudget();
+    }
+
+    function updateSellDateFromDays() {
+      const buy = new Date(buyDateEl.value);
+      const days = parseInt(holdingDaysEl.value) || 0;
+      if (!isNaN(buy.getTime())) {
+        const newSell = new Date(buy);
+        newSell.setDate(buy.getDate() + days);
+        sellDateEl.value = newSell.toISOString().split('T')[0];
+      }
+      calculateFromBudget();
+    }
+
+    // Двостороння синхронізація Ставка купона ⇄ НКД за день
+    let isRateUpdating = false;
+
+    couponRateEl.addEventListener('input', () => {
+      if (isRateUpdating) return;
+      isRateUpdating = true;
+      const rate = parseFloat(couponRateEl.value) || 0;
+      const calculatedNkd = (1000 * (rate / 100)) / 365;
+      dailyNkdEl.value = calculatedNkd.toFixed(3);
+      calculateFromBudget();
+      isRateUpdating = false;
+    });
+
+    dailyNkdEl.addEventListener('input', () => {
+      if (isRateUpdating) return;
+      isRateUpdating = true;
+      const nkd = parseFloat(dailyNkdEl.value) || 0;
+      const calculatedRate = (nkd * 365 / 1000) * 100;
+      couponRateEl.value = calculatedRate.toFixed(2);
+      calculateFromBudget();
+      isRateUpdating = false;
+    });
+
+    buyDateEl.addEventListener('change', updateDaysFromDates);
+    sellDateEl.addEventListener('change', updateDaysFromDates);
+    holdingDaysEl.addEventListener('input', updateSellDateFromDays);
+
+    let isUpdating = false;
+
+    function calculateFromBudget() {
+      if (isUpdating) return;
+      isUpdating = true;
+
+      const budget = parseFloat(budgetInput.value) || 0;
+      const price = parseFloat(buyPriceInput.value) || 0;
+      const feePercent = parseFloat(customFeePercentEl.value) || 0;
+
+      const costPerBondWithFee = price * (1 + feePercent / 100);
+      let count = 0;
+      if (costPerBondWithFee > 0) {
+        count = Math.floor(budget / costPerBondWithFee);
+      }
+      bondsCountInput.value = count;
+
+      updateFinalResults(count, budget);
+      saveToStorage();
+      isUpdating = false;
+    }
+
+    function calculateFromCount() {
+      if (isUpdating) return;
+      isUpdating = true;
+
+      const count = parseInt(bondsCountInput.value) || 0;
+      const price = parseFloat(buyPriceInput.value) || 0;
+      const feePercent = parseFloat(customFeePercentEl.value) || 0;
+
+      const rawTotal = count * price;
+      const fee = rawTotal * (feePercent / 100);
+      const total = rawTotal + fee;
+
+      budgetInput.value = total.toFixed(2);
+
+      updateFinalResults(count, total);
+      saveToStorage();
+      isUpdating = false;
+    }
+
+    budgetInput.addEventListener('input', calculateFromBudget);
+    bondsCountInput.addEventListener('input', calculateFromCount);
+    buyPriceInput.addEventListener('input', calculateFromBudget);
+
+    function updateFinalResults(count, totalBudgetUsed) {
+      const price = parseFloat(buyPriceInput.value) || 0;
+      const days = parseInt(holdingDaysEl.value) || 0;
+      const nkd = parseFloat(dailyNkdEl.value) || 0;
+      const feePercent = parseFloat(customFeePercentEl.value) || 0;
+
+      const rawPurchaseTotal = count * price;
+      const calculatedFee = rawPurchaseTotal * (feePercent / 100);
+      const totalExpenses = rawPurchaseTotal + calculatedFee;
+      const unspent = Math.max(0, totalBudgetUsed - totalExpenses);
+
+      const expectedSellPrice = price + (days * nkd);
+      const totalSellRevenue = count * expectedSellPrice;
+      const netProfit = totalSellRevenue - totalExpenses;
+      const roiPercent = totalExpenses > 0 ? (netProfit / totalExpenses) * 100 : 0;
+
+      // Оновлення DOM
+      document.getElementById('unspentAmount').textContent = unspent.toFixed(2) + ' грн';
+      document.getElementById('rawPurchaseTotal').textContent = rawPurchaseTotal.toFixed(2) + ' грн';
+      document.getElementById('feeLabelText').textContent = `Комісія (${feePercent}%):`;
+      document.getElementById('calculatedFee').textContent = calculatedFee.toFixed(2) + ' грн';
+      document.getElementById('totalExpenses').textContent = totalExpenses.toFixed(2) + ' грн';
+      document.getElementById('expectedSellPrice').textContent = expectedSellPrice.toFixed(2) + ' грн';
+      document.getElementById('totalSellRevenue').textContent = totalSellRevenue.toFixed(2) + ' грн';
+
+      const resultCard = document.getElementById('resultCard');
+      const resultIcon = document.getElementById('resultIcon');
+      const resultLabel = document.getElementById('resultLabel');
+      const netProfitEl = document.getElementById('netProfit');
+      const roiPercentEl = document.getElementById('roiPercent');
+
+      if (netProfit >= 0) {
+        resultCard.className = 'p-4 rounded-xl border flex items-center justify-between bg-emerald-950/40 border-emerald-500/40 text-emerald-400 mt-4';
+        resultIcon.textContent = '📈';
+        resultLabel.textContent = 'Чистий прибуток';
+        netProfitEl.textContent = '+' + netProfit.toFixed(2) + ' грн';
+        roiPercentEl.textContent = '+' + roiPercent.toFixed(2) + '%';
+      } else {
+        resultCard.className = 'p-4 rounded-xl border flex items-center justify-between bg-rose-950/40 border-rose-500/40 text-rose-400 mt-4';
+        resultIcon.textContent = '⚠️';
+        resultLabel.textContent = 'Чистий збиток';
+        netProfitEl.textContent = netProfit.toFixed(2) + ' грн';
+        roiPercentEl.textContent = roiPercent.toFixed(2) + '%';
+      }
+    }
+
+    // Первинний запуск
+    calculateFromBudget();
+  </script>
 </body>
 </html>
