@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Журнал угод ОВДП</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 flex flex-col items-center">
+
+  <!-- Навігація між сторінками -->
+  <nav class="top-nav w-full max-w-5xl flex flex-wrap gap-2 mb-4 bg-slate-900 p-3 rounded-xl border border-slate-800">
+    <a href="index.html" class="nav-link px-3 py-1.5 rounded-lg text-xs sm:text-sm text-slate-400 hover:text-white transition-all">Головна</a>
+    <a href="index2.html" class="nav-link px-3 py-1.5 rounded-lg text-xs sm:text-sm text-slate-400 hover:text-white transition-all">Калькулятор</a>
+    <a href="journal.html" class="nav-link active px-3 py-1.5 rounded-lg text-xs sm:text-sm bg-blue-600 text-white font-semibold shadow">📖 Журнал угод</a>
+  </nav>
+
+  <div class="max-w-5xl w-full mx-auto space-y-4">
+    
+    <!-- Заголовок та повзунок-перемикач режиму -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="p-2.5 bg-blue-600/20 text-blue-400 rounded-xl">📖</div>
+        <div>
+          <h2 class="text-base sm:text-lg font-bold">Журнал збережених розрахунків</h2>
+          <p class="text-xs text-slate-400">Історія угод із можливістю зміни режиму перегляду</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-end">
+        <!-- СТИЛЬНИЙ ПОВЗУНОК-ПЕРЕМИКАЧ -->
+        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+          <button 
+            type="button" 
+            id="btnModeCards" 
+            onclick="setMode('cards')" 
+            class="px-3 py-1.5 rounded-lg transition-all"
+          >
+            📇 Картки
+          </button>
+          <button 
+            type="button" 
+            id="btnModeTable" 
+            onclick="setMode('table')" 
+            class="px-3 py-1.5 rounded-lg transition-all"
+          >
+            📊 Таблиця
+          </button>
+        </div>
+
+        <button 
+          type="button" 
+          id="clearJournalBtn"
+          class="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-semibold transition-all"
+        >
+          🗑️ Очистити
+        </button>
+      </div>
+    </div>
+
+    <!-- КОНТЕЙНЕР ДЛЯ РЕЖИМУ КАРТОК -->
+    <div id="cardsContainer" class="space-y-3 hidden">
+      <!-- Динамічні картки -->
+    </div>
+
+    <!-- КОНТЕЙНЕР ДЛЯ РЕЖИМУ ТАБЛИЦІ -->
+    <div id="tableContainer" class="overflow-x-auto rounded-2xl border border-slate-800 hidden">
+      <table class="w-full text-left border-collapse text-xs sm:text-sm">
+        <thead>
+          <tr class="bg-slate-950 text-slate-400 border-b border-slate-800 text-[11px] uppercase tracking-wider">
+            <th class="p-3">Бюджет та нотатка</th>
+            <th class="p-3">Ціна (купівля ➔ продаж) та термін</th>
+            <th class="p-3">Сума при продажу / Прибуток</th>
+            <th class="p-3">Дохідність та екв. депозиту</th>
+            <th class="p-3">Час запису</th>
+            <th class="p-3 text-center">Дія</th>
+          </tr>
+        </thead>
+        <tbody id="journalTableBody" class="divide-y divide-slate-800/60 bg-slate-900/40">
+          <!-- Динамічні рядки -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Повідомлення, якщо журнал пустий -->
+    <div id="emptyMessage" class="hidden text-center py-12 text-slate-500 text-sm bg-slate-900/50 rounded-2xl border border-slate-800">
+      Журнал поки що порожній. Перейдіть в <a href="index2.html" class="text-blue-400 underline font-medium">Калькулятор</a> і збережіть розрахунок.
+    </div>
+
+  </div>
+
+  <script>
+    const JOURNAL_KEY = 'ovdp_journal_records_v1';
+    const VIEW_MODE_KEY = 'ovdp_journal_view_mode';
+    
+    const cardsContainer = document.getElementById('cardsContainer');
+    const tableContainer = document.getElementById('tableContainer');
+    const tableBody = document.getElementById('journalTableBody');
+    const emptyMessage = document.getElementById('emptyMessage');
+    const clearJournalBtn = document.getElementById('clearJournalBtn');
+    
+    const btnModeCards = document.getElementById('btnModeCards');
+    const btnModeTable = document.getElementById('btnModeTable');
+
+    let currentMode = localStorage.getItem(VIEW_MODE_KEY) || 'cards';
+
+    function setMode(mode) {
+      currentMode = mode;
+      localStorage.setItem(VIEW_MODE_KEY, currentMode);
+      renderJournal();
+    }
+
+    function updateSliderUI() {
+      if (currentMode === 'cards') {
+        btnModeCards.className = "px-3 py-1.5 rounded-lg bg-blue-600 text-white shadow transition-all";
+        btnModeTable.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all";
+      } else {
+        btnModeTable.className = "px-3 py-1.5 rounded-lg bg-blue-600 text-white shadow transition-all";
+        btnModeCards.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all";
+      }
+    }
+
+    function renderJournal() {
+      let journal = [];
+      try {
+        const saved = localStorage.getItem(JOURNAL_KEY);
+        if (saved) journal = JSON.parse(saved);
+      } catch(e) { console.error(e); }
+
+      updateSliderUI();
+
+      cardsContainer.innerHTML = '';
+      tableBody.innerHTML = '';
+
+      if (journal.length === 0) {
+        emptyMessage.classList.remove('hidden');
+        cardsContainer.classList.add('hidden');
+        tableContainer.classList.add('hidden');
+        return;
+      }
+
+      emptyMessage.classList.add('hidden');
+
+      if (currentMode === 'cards') {
+        cardsContainer.classList.remove('hidden');
+        tableContainer.classList.add('hidden');
+        renderCards(journal);
+      } else {
+        cardsContainer.classList.add('hidden');
+        tableContainer.classList.remove('hidden');
+        renderTable(journal);
+      }
+    }
+
+    // РЕНДЕР КАРТОК З ДОДАТКОВОЮ ІНФОРМАТИВНІСТЮ НА СТАРТІ
+    function renderCards(journal) {
+      journal.forEach((item, index) => {
+        const rawTotal = item.rawPurchaseTotal || '—';
+        const feeText = item.calculatedFee ? `${item.calculatedFee} (${item.feePercent || 0}%)` : '0 грн (0%)';
+        const sellPrice = item.expectedSellPrice || '—';
+        const sellRev = item.totalSellRevenue || '—';
+        const noteText = item.note ? item.note : 'Без нотатки';
+        const datePart = item.id.split(',')[0] || item.id;
+
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden transition-all shadow-md hover:border-slate-700";
+
+        card.innerHTML = `
+          <!-- ГОЛОВНИЙ ЕКРАН КАРТКИ (Більше інфо одразу) -->
+          <div onclick="toggleCard(${index})" class="p-4 flex flex-col sm:flex-row sm:items-center justify-between cursor-pointer select-none gap-3">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-10 h-10 rounded-xl bg-blue-600/15 text-blue-400 flex items-center justify-center font-bold text-base shrink-0">
+                📊
+              </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-black text-slate-100 text-base sm:text-lg">${parseFloat(item.budget).toLocaleString('uk-UA')} грн</span>
+                  <span class="text-[11px] px-2 py-0.5 bg-slate-800 text-slate-300 rounded-full font-mono">${datePart}</span>
+                </div>
+                <div class="text-xs text-amber-400 font-medium mt-0.5">
+                  📌 ${noteText}
+                </div>
+              </div>
+            </div>
+
+            <!-- Інформативні міні-блоки на старті -->
+            <div class="flex items-center justify-between sm:justify-end space-x-4 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-800">
+              <div class="text-left sm:text-right">
+                <div class="text-xs text-blue-400 font-medium">${item.bondsCount} шт. по ${item.buyPrice} грн</div>
+                <div class="text-[11px] text-slate-400">Вихід: <span class="text-emerald-300">${sellPrice} грн</span></div>
+              </div>
+              <div>
+                <div class="font-black text-emerald-400 text-sm sm:text-base">${item.netProfit}</div>
+                <div class="text-[11px] text-slate-300 font-semibold">${item.roi} <span class="text-slate-500">|</span> ${item.apy}</div>
+              </div>
+              <div id="arrow-card-${index}" class="text-slate-500 text-xs transition-transform duration-300">
+                ▼
+              </div>
+            </div>
+          </div>
+
+          <!-- ДЕТАЛІ КАРТКИ (Повний розгорнутий стан) -->
+          <div id="details-card-${index}" class="hidden border-t border-slate-800/80 bg-slate-950/60 p-4 space-y-3 text-xs sm:text-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-1.5">
+                <div class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">📥 Параметри купівлі</div>
+                <div class="flex justify-between text-slate-300"><span>Кількість:</span> <span class="font-bold text-white">${item.bondsCount} шт.</span></div>
+                <div class="flex justify-between text-slate-300"><span>Тіло облігацій:</span> <span class="text-white">${rawTotal}</span></div>
+                <div class="flex justify-between text-slate-300"><span>Ціна 1 шт:</span> <span class="font-bold text-white">${item.buyPrice} грн</span></div>
+                <div class="flex justify-between text-slate-300"><span>Комісія:</span> <span class="text-slate-400">${feeText}</span></div>
+                <div class="flex justify-between text-slate-300"><span>Дата купівлі:</span> <span class="text-slate-400">${item.buyDate}</span></div>
+              </div>
+
+              <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-1.5">
+                <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">📤 Параметри виходу</div>
+                <div class="flex justify-between text-slate-300"><span>Ціна продажу 1 шт:</span> <span class="font-bold text-emerald-300">${sellPrice} грн</span></div>
+                <div class="flex justify-between text-slate-300"><span>Загальна виплата:</span> <span class="font-bold text-white">${sellRev}</span></div>
+                <div class="flex justify-between text-slate-300"><span>Термін утримання:</span> <span class="text-white">${item.holdingDays} днів</span></div>
+                <div class="flex justify-between text-slate-300"><span>Дата продажу:</span> <span class="text-slate-400">${item.sellDate}</span></div>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-2 border-t border-slate-800/80 gap-2">
+              <div class="text-xs text-slate-300">
+                🏦 Еквівалент депозиту: <strong class="text-amber-300">${item.equivalentDeposit}</strong> <span class="text-slate-400 text-[10px]">(податок 23%)</span>
+              </div>
+              <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-end">
+                <span class="text-[10px] font-mono text-slate-500">${item.id}</span>
+                <button onclick="deleteRecord(${index})" class="px-2.5 py-1 bg-rose-600/10 hover:bg-rose-600/30 text-rose-400 rounded-lg text-xs transition-all font-medium">
+                  ❌ Видалити
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        cardsContainer.appendChild(card);
+      });
+    }
+
+    // РЕНДЕР ТАБЛИЦІ (З прихованим першим стовпчиком у згорнутому вигляді)
+    function renderTable(journal) {
+      journal.forEach((item, index) => {
+        const rawTotal = item.rawPurchaseTotal || '—';
+        const feeText = item.calculatedFee ? `комісія: ${item.calculatedFee}` : '';
+        const sellPrice = item.expectedSellPrice || '—';
+        const sellRev = item.totalSellRevenue || '—';
+        
+        const noteText = item.note ? `📌 ${item.note}` : `${item.id.split(',')[0]}`;
+        const subNoteHtml = `<div class="text-xs text-amber-400 font-medium mt-0.5 truncate max-w-[180px]">${noteText}</div>`;
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/40 transition-all cursor-pointer select-none";
+        tr.setAttribute('onclick', `toggleRow(${index})`);
+
+        tr.innerHTML = `
+          <!-- 1. Бюджет та нотатка (деталі кількості/комісії сховані до розгортання) -->
+          <td class="p-3 whitespace-nowrap align-top">
+            <div class="font-bold text-slate-100 text-sm">
+              ${parseFloat(item.budget).toLocaleString('uk-UA')} грн
+            </div>
+            ${subNoteHtml}
+            <div id="extra-col1-${index}" class="hidden space-y-0.5 mt-1 pt-1 border-t border-slate-800/80">
+              <div class="text-xs text-blue-400 font-medium">
+                ${item.bondsCount} шт (${rawTotal})
+              </div>
+              <div class="text-[11px] text-slate-400">
+                ${feeText ? `💸 ${feeText} (${item.feePercent || 0}%)` : ''}
+              </div>
+            </div>
+          </td>
+
+          <!-- 2. Ціна та термін -->
+          <td class="p-3 whitespace-nowrap align-top">
+            <div class="text-slate-200 font-medium">
+              🪙 ${item.buyPrice} грн <span class="text-slate-500">➔</span> <span class="text-emerald-300">${sellPrice}</span>
+            </div>
+            <div id="extra-col2-${index}" class="text-xs text-slate-400 mt-1 hidden">
+              ⏳ ${item.holdingDays} днів (${item.buyDate} ➔ ${item.sellDate})
+            </div>
+          </td>
+
+          <!-- 3. Сума при продажу / Прибуток -->
+          <td class="p-3 whitespace-nowrap align-top">
+            <div class="font-bold text-slate-200 text-sm">${sellRev}</div>
+            <div class="font-black text-emerald-400 text-xs mt-0.5">${item.netProfit}</div>
+          </td>
+
+          <!-- 4. Дохідність та еквівалент депозиту -->
+          <td class="p-3 whitespace-nowrap align-top">
+            <div class="text-slate-200 font-semibold text-xs">
+              ${item.roi} &nbsp;|&nbsp; ${item.apy}
+            </div>
+            <div id="extra-col4-${index}" class="text-[11px] text-amber-300 font-medium mt-1 hidden">
+              ${item.equivalentDeposit} <span class="text-slate-400 text-[10px]">(податок 23%)</span>
+            </div>
+          </td>
+
+          <!-- 5. Час запису -->
+          <td class="p-3 font-mono text-slate-400 whitespace-nowrap align-top text-xs">
+            <div class="text-slate-300">${item.id.split(',')[0]}</div>
+            <div class="text-[11px]">${item.id.split(',')[1] || ''}</div>
+          </td>
+
+          <!-- 6. Дія -->
+          <td class="p-3 text-center whitespace-nowrap align-middle" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-center space-x-2">
+              <button onclick="deleteRecord(${index})" class="p-2 bg-rose-600/10 hover:bg-rose-600/30 text-rose-400 rounded-lg text-xs transition-all" title="Видалити запис">
+                ❌
+              </button>
+              <span id="arrow-table-${index}" class="text-slate-400 text-xs transition-transform duration-300 inline-block">▼</span>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    window.toggleCard = function(index) {
+      const details = document.getElementById(`details-card-${index}`);
+      const arrow = document.getElementById(`arrow-card-${index}`);
+      if (details.classList.contains('hidden')) {
+        details.classList.remove('hidden');
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        details.classList.add('hidden');
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    };
+
+    window.toggleRow = function(index) {
+      const col1 = document.getElementById(`extra-col1-${index}`);
+      const col2 = document.getElementById(`extra-col2-${index}`);
+      const col4 = document.getElementById(`extra-col4-${index}`);
+      const arrow = document.getElementById(`arrow-table-${index}`);
+
+      if (col1.classList.contains('hidden')) {
+        col1.classList.remove('hidden');
+        col2.classList.remove('hidden');
+        col4.classList.remove('hidden');
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        col1.classList.add('hidden');
+        col2.classList.add('hidden');
+        col4.classList.add('hidden');
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    };
+
+    window.deleteRecord = function(index) {
+      let journal = [];
+      try {
+        journal = JSON.parse(localStorage.getItem(JOURNAL_KEY)) || [];
+      } catch(e) {}
+      
+      journal.splice(index, 1);
+      localStorage.setItem(JOURNAL_KEY, JSON.stringify(journal));
+      renderJournal();
+    };
+
+    clearJournalBtn.addEventListener('click', () => {
+      if (confirm("Ви дійсно хочете очистити весь журнал угод?")) {
+        localStorage.removeItem(JOURNAL_KEY);
+        renderJournal();
+      }
+    });
+
+    renderJournal();
+  </script>
+</body>
+</html>
