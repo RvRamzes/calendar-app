@@ -7,29 +7,30 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-4 flex flex-col items-center">
+<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-4 flex flex-col items-center">
 
   <!-- Навігація між сторінками -->
-  <nav class="top-nav w-full max-w-2xl flex space-x-4 mb-6 bg-slate-900 p-3 rounded-xl border border-slate-800">
-    <a href="index.html" class="nav-link px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-white transition-all">Сторінка 1</a>
-    <a href="index2.html" class="nav-link active px-4 py-2 rounded-lg text-sm bg-blue-600 text-white font-semibold shadow">Сторінка 2 (Калькулятор)</a>
+  <nav class="top-nav w-full max-w-2xl flex flex-wrap gap-2 mb-4 bg-slate-900 p-3 rounded-xl border border-slate-800">
+    <a href="index.html" class="nav-link px-3 py-1.5 rounded-lg text-xs sm:text-sm text-slate-400 hover:text-white transition-all">Головна</a>
+    <a href="index2.html" class="nav-link active px-3 py-1.5 rounded-lg text-xs sm:text-sm bg-blue-600 text-white font-semibold shadow">Калькулятор</a>
+    <a href="journal.html" class="nav-link px-3 py-1.5 rounded-lg text-xs sm:text-sm text-slate-400 hover:text-white transition-all">📖 Журнал угод</a>
   </nav>
 
-  <div class="max-w-2xl w-full mx-auto p-6 bg-slate-900 rounded-2xl shadow-xl border border-slate-800 space-y-6">
+  <div class="max-w-2xl w-full mx-auto p-4 sm:p-6 bg-slate-900 rounded-2xl shadow-xl border border-slate-800 space-y-5">
     
     <!-- Заголовок та кнопка скидання -->
-    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-800 pb-4">
       <div class="flex items-center space-x-3">
-        <div class="p-2.5 bg-blue-600/20 text-blue-400 rounded-xl">📊</div>
+        <div class="p-2.5 bg-blue-600/20 text-blue-400 rounded-xl shrink-0">📊</div>
         <div>
-          <h2 class="text-xl font-bold">Розумний калькулятор ОВДП</h2>
+          <h2 class="text-lg sm:text-xl font-bold">Розумний калькулятор ОВДП</h2>
           <p class="text-xs text-slate-400">Автоматичний розрахунок із порівнянням до депозиту (податки 23%)</p>
         </div>
       </div>
       <button 
         type="button" 
         id="resetBtn"
-        class="px-3 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1"
+        class="self-start sm:self-auto px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1 shrink-0"
         title="Скинути налаштування за замовчуванням"
       >
         <span>🔄 Скинути</span>
@@ -37,99 +38,51 @@
     </div>
 
     <!-- БЛОК 1: ВХІДНІ ДАНІ ТА ВКЛАД -->
-    <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800 space-y-4">
+    <div class="bg-slate-950/50 p-3 sm:p-4 rounded-xl border border-slate-800 space-y-4">
       <div class="text-xs font-semibold text-blue-400 uppercase tracking-wider">📥 1. Вклад та параметри угоди</div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Доступна сума (Бюджет) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <div>
           <label class="block text-xs text-slate-400 mb-1">Бажана сума вкладу (грн)</label>
-          <input
-            id="budgetInput"
-            type="number"
-            step="100"
-            value="1028.93"
-            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-medium"
-          />
+          <input id="budgetInput" type="number" step="100" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-medium text-sm" />
         </div>
-
-        <!-- Кількість облігацій (синхронізується) -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Кількість ОВДП (шт)</label>
-          <input
-            id="bondsCount"
-            type="number"
-            min="1"
-            value="1"
-            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-medium"
-          />
+          <input id="bondsCount" type="number" min="1" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 font-medium text-sm" />
         </div>
-
-        <!-- Ціна купівлі -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Ціна купівлі 1 шт (грн)</label>
-          <input
-            id="buyPrice"
-            type="number"
-            step="0.4"
-            value="1028.93"
-            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-          />
+          <input id="buyPrice" type="number" step="0.4" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 text-sm" />
         </div>
-
-        <!-- Днів утримання -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Днів утримання (до продажу)</label>
-          <input
-            id="holdingDays"
-            type="number"
-            min="1"
-            value="30"
-            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-          />
+          <input id="holdingDays" type="number" min="1" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 text-sm" />
         </div>
-
-        <!-- Дата купівлі -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Дата купівлі</label>
-          <input
-            id="buyDate"
-            type="date"
-            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-          />
+          <input id="buyDate" type="date" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 text-sm" />
         </div>
-
-        <!-- Дата продажу -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Дата продажу / погашення</label>
-          <input
-            id="sellDate"
-            type="date"
-            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-          />
+          <input id="sellDate" type="date" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 text-sm" />
         </div>
-
-        <!-- Ставка купона % -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Ставка купона (% річних)</label>
-          <input
-            id="couponRate"
-            type="number"
-            step="0.01"
-            value="14.60"
-            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
-          />
+          <input id="couponRate" type="number" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 text-sm" />
         </div>
-
-        <!-- Приріст НКД за день -->
         <div>
           <label class="block text-xs text-slate-400 mb-1">Приріст НКД за день (грн)</label>
+          <input id="dailyNkd" type="number" step="0.001" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 text-sm" />
+        </div>
+
+        <!-- Поле нотатки (на всю ширину) -->
+        <div class="md:col-span-2">
+          <label class="block text-xs text-slate-400 mb-1">Нотатка до угоди (серія ОВДП тощо)</label>
           <input
-            id="dailyNkd"
-            type="number"
-            step="0.001"
-            value="0.400"
-            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+            id="journalNote"
+            type="text"
+            placeholder="Наприклад: Випуск UA4000227490"
+            class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-500 text-sm"
           />
         </div>
       </div>
@@ -137,100 +90,90 @@
       <!-- Вибір джерела коштів та комісій -->
       <div class="pt-2 border-t border-slate-800">
         <label class="block text-xs text-slate-400 mb-2">Джерело коштів та комісія</label>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-          <button type="button" data-type="debit" class="fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">
-            💳 Власні (0%)
-          </button>
-          <button type="button" data-type="credit" class="fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">
-            🏦 Кредитка (3.5%)
-          </button>
-          <button type="button" data-type="icu" class="fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">
-            🏛️ ICU (0.15%)
-          </button>
-          <button type="button" data-type="diia" class="fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">
-            📱 Дія (0.2%)
-          </button>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+          <button type="button" data-type="debit" class="fee-btn p-2 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">💳 Власні (0%)</button>
+          <button type="button" data-type="credit" class="fee-btn p-2 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">🏦 Кредитка (3.5%)</button>
+          <button type="button" data-type="icu" class="fee-btn p-2 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">🏛️ ICU (0.15%)</button>
+          <button type="button" data-type="diia" class="fee-btn p-2 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400">📱 Дія (0.2%)</button>
         </div>
 
-        <div class="flex items-center justify-between bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-xs">
           <span id="feeDescription" class="text-slate-400">Оберіть джерело або введіть комісію вручну.</span>
-          <div class="flex items-center space-x-2">
+          <div class="flex items-center space-x-2 self-end sm:self-auto">
             <span class="text-slate-400">Ставка (%):</span>
-            <input
-              id="customFeePercent"
-              type="number"
-              step="0.01"
-              value="0.00"
-              class="w-16 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white text-right focus:outline-none focus:border-blue-500"
-            />
+            <input id="customFeePercent" type="number" step="0.01" class="w-16 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white text-right focus:outline-none focus:border-blue-500 text-xs" />
           </div>
         </div>
       </div>
     </div>
 
     <!-- БЛОК 2: РОЗРАХУНОК ТА ДОХІД -->
-    <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-4">
+    <div class="bg-slate-950/80 p-3 sm:p-4 rounded-xl border border-slate-800 space-y-4">
       <div class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">📊 2. Деталізація та фінансовий результат</div>
 
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between text-amber-400 font-medium">
+      <div class="space-y-2.5 text-xs sm:text-sm">
+        <div class="flex justify-between items-center text-amber-400 font-medium">
           <span>Невикористаний залишок (готівка):</span>
-          <span id="unspentAmount">0.00 грн</span>
+          <span id="unspentAmount" class="whitespace-nowrap font-bold">0.00 грн</span>
         </div>
-        <div class="flex justify-between text-slate-400">
+        <div class="flex justify-between items-center text-slate-400">
           <span>Чиста вартість облігацій:</span>
-          <span id="rawPurchaseTotal">0.00 грн</span>
+          <span id="rawPurchaseTotal" class="whitespace-nowrap">0.00 грн</span>
         </div>
-        <div class="flex justify-between text-slate-400">
+        <div class="flex justify-between items-center text-slate-400">
           <span id="feeLabelText">Комісія:</span>
-          <span id="calculatedFee">0.00 грн</span>
+          <span id="calculatedFee" class="whitespace-nowrap">0.00 грн</span>
         </div>
-        <div class="flex justify-between text-slate-300 border-t border-slate-800 pt-2 font-medium">
+        <div class="flex justify-between items-center text-slate-300 border-t border-slate-800 pt-2 font-medium">
           <span>Загальні витрати на купівлю:</span>
-          <span id="totalExpenses">0.00 грн</span>
+          <span id="totalExpenses" class="whitespace-nowrap">0.00 грн</span>
         </div>
-        <div class="flex justify-between text-slate-300">
+        <div class="flex justify-between items-center text-slate-300">
           <span>Очікувана ціна продажу (1 шт):</span>
-          <span id="expectedSellPrice">0.00 грн</span>
+          <span id="expectedSellPrice" class="whitespace-nowrap">0.00 грн</span>
         </div>
-        <div class="flex justify-between text-slate-300">
+        <div class="flex justify-between items-center text-slate-300">
           <span>Сума при продажу / виплаті:</span>
-          <span id="totalSellRevenue">0.00 грн</span>
+          <span id="totalSellRevenue" class="whitespace-nowrap">0.00 грн</span>
         </div>
       </div>
 
       <!-- Підсумкова картка прибутку -->
-      <div id="resultCard" class="p-4 rounded-xl border flex flex-col space-y-3 bg-emerald-950/40 border-emerald-500/40 text-emerald-400 mt-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <span id="resultIcon" class="text-2xl">📈</span>
+      <div id="resultCard" class="p-3 sm:p-4 rounded-xl border flex flex-col space-y-3 bg-emerald-950/40 border-emerald-500/40 text-emerald-400 mt-4">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center space-x-2 sm:space-x-3">
+            <span id="resultIcon" class="text-xl sm:text-2xl">📈</span>
             <div>
-              <div id="resultLabel" class="text-xs font-medium uppercase tracking-wider opacity-80">Чистий прибуток</div>
-              <div id="netProfit" class="text-2xl font-black">+0.00 грн</div>
+              <div id="resultLabel" class="text-[10px] sm:text-xs font-medium uppercase tracking-wider opacity-80">Чистий прибуток</div>
+              <div id="netProfit" class="text-xl sm:text-2xl font-black whitespace-nowrap">+0.00 грн</div>
             </div>
           </div>
-
-          <div class="text-right">
-            <div class="text-xs opacity-80">За період (ROI)</div>
-            <div id="roiPercent" class="text-lg font-bold">+0.00%</div>
+          <div class="text-right shrink-0">
+            <div class="text-[10px] sm:text-xs opacity-80">За період (ROI)</div>
+            <div id="roiPercent" class="text-base sm:text-lg font-bold whitespace-nowrap">+0.00%</div>
           </div>
         </div>
 
-        <div class="pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs">
-          <div class="flex items-center space-x-1.5 text-emerald-300">
-            <span>🏦 Чисті річні (APY):</span>
-          </div>
-          <div id="annualizedRoi" class="font-bold text-sm text-emerald-300">+0.00% річних</div>
+        <div class="pt-2 sm:pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs">
+          <div class="flex items-center space-x-1.5 text-emerald-300"><span>🏦 Чисті річні (APY):</span></div>
+          <div id="annualizedRoi" class="font-bold text-xs sm:text-sm text-emerald-300 whitespace-nowrap">+0.00% річних</div>
         </div>
       </div>
 
-      <!-- Блок динамічного порівняння з депозитом (податок 23%) -->
+      <!-- КНОПКА ЗБЕРЕЖЕННЯ В ЖУРНАЛ -->
+      <button 
+        type="button" 
+        id="saveToJournalBtn"
+        class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-sm transition-all shadow-lg flex items-center justify-center space-x-2"
+      >
+        <span>💾 Зберегти поточний розрахунок у журнал</span>
+      </button>
+
+      <!-- Блок порівняння з депозитом -->
       <div class="p-3 bg-blue-950/30 border border-blue-500/30 rounded-lg text-xs text-blue-300 space-y-1">
-        <div class="font-semibold flex items-center space-x-1">
-          <span>💡 Порівняння з банківським депозитом (податки 23%):</span>
-        </div>
+        <div class="font-semibold flex items-center space-x-1"><span>💡 Порівняння з банківським депозитом (податки 23%):</span></div>
         <p id="depositComparisonText" class="opacity-90 leading-relaxed">
-          Оскільки дохід від ОВДП <strong>не оподатковується (0%)</strong>, щоб отримати такий самий чистий прибуток на класичному банківському депозиті (де стягується 23% податків: 18% ПДФО + 5% ВЗ), ставка по депозиту мала б складати не менше <strong id="equivalentDepositRate" class="text-amber-300">~0.00% річних</strong>.
+          Оскільки дохід від ОВДП <strong>не оподатковується (0%)</strong>, щоб отримати такий самий чистий прибуток на класичному банківському депозиті (де стягується 23% податків: 18% ПДФО + 5% ВЗ), ставка по депозиту мала б складати не менше <strong id="equivalentDepositRate" class="text-amber-300 whitespace-nowrap">~0.00% річних</strong>.
         </p>
       </div>
 
@@ -250,8 +193,11 @@
     const customFeePercentEl = document.getElementById('customFeePercent');
     const feeDescriptionEl = document.getElementById('feeDescription');
     const resetBtn = document.getElementById('resetBtn');
+    const saveToJournalBtn = document.getElementById('saveToJournalBtn');
+    const journalNoteEl = document.getElementById('journalNote');
 
-    const STORAGE_KEY = 'ovdp_calc_data_v5';
+    const STORAGE_KEY = 'ovdp_calc_data_v7';
+    const JOURNAL_KEY = 'ovdp_journal_records_v1';
 
     function getDefaultValues() {
       const today = new Date();
@@ -267,7 +213,8 @@
         sellDate: formatDate(defaultSellDate),
         couponRate: "14.60",
         dailyNkd: "0.400",
-        feePercent: "0.00"
+        feePercent: "0.00",
+        note: ""
       };
     }
 
@@ -281,7 +228,8 @@
         sellDate: sellDateEl.value,
         couponRate: couponRateEl.value,
         dailyNkd: dailyNkdEl.value,
-        feePercent: customFeePercentEl.value
+        feePercent: customFeePercentEl.value,
+        note: journalNoteEl.value
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
@@ -300,6 +248,7 @@
           if (data.couponRate !== undefined) couponRateEl.value = data.couponRate;
           if (data.dailyNkd !== undefined) dailyNkdEl.value = data.dailyNkd;
           if (data.feePercent !== undefined) customFeePercentEl.value = data.feePercent;
+          if (data.note !== undefined) journalNoteEl.value = data.note;
           return true;
         } catch(e) {
           console.error(e);
@@ -319,11 +268,11 @@
       couponRateEl.value = defaults.couponRate;
       dailyNkdEl.value = defaults.dailyNkd;
       customFeePercentEl.value = defaults.feePercent;
+      journalNoteEl.value = defaults.note;
     }
 
     resetBtn.addEventListener('click', () => {
       localStorage.removeItem(STORAGE_KEY);
-      
       const defaults = getDefaultValues();
       budgetInput.value = defaults.budget;
       bondsCountInput.value = defaults.bondsCount;
@@ -334,13 +283,52 @@
       couponRateEl.value = defaults.couponRate;
       dailyNkdEl.value = defaults.dailyNkd;
       customFeePercentEl.value = defaults.feePercent;
+      journalNoteEl.value = defaults.note;
       feeDescriptionEl.textContent = "Оберіть джерело або введіть комісію вручну.";
-
       feeButtons.forEach(b => {
-        b.className = 'fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400';
+        b.className = 'fee-btn p-2 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400';
       });
-
       calculateFromBudget();
+    });
+
+    // ЗБЕРЕЖЕННЯ В ЖУРНАЛ
+    saveToJournalBtn.addEventListener('click', () => {
+      const record = {
+        id: new Date().toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'medium' }),
+        note: journalNoteEl.value.trim(),
+        budget: budgetInput.value,
+        bondsCount: bondsCountInput.value,
+        rawPurchaseTotal: document.getElementById('rawPurchaseTotal').textContent,
+        calculatedFee: document.getElementById('calculatedFee').textContent,
+        feePercent: customFeePercentEl.value,
+        buyPrice: buyPriceInput.value,
+        expectedSellPrice: document.getElementById('expectedSellPrice').textContent,
+        totalSellRevenue: document.getElementById('totalSellRevenue').textContent,
+        holdingDays: holdingDaysEl.value,
+        buyDate: buyDateEl.value,
+        sellDate: sellDateEl.value,
+        netProfit: document.getElementById('netProfit').textContent,
+        roi: document.getElementById('roiPercent').textContent,
+        apy: document.getElementById('annualizedRoi').textContent,
+        equivalentDeposit: document.getElementById('equivalentDepositRate').textContent
+      };
+
+      let journal = [];
+      try {
+        const savedJournal = localStorage.getItem(JOURNAL_KEY);
+        if (savedJournal) journal = JSON.parse(savedJournal);
+      } catch(e) { console.error(e); }
+
+      journal.unshift(record);
+      localStorage.setItem(JOURNAL_KEY, JSON.stringify(journal));
+
+      const originalText = saveToJournalBtn.innerHTML;
+      saveToJournalBtn.innerHTML = "<span>✅ Успішно збережено в журнал!</span>";
+      saveToJournalBtn.className = "w-full py-3 bg-emerald-600 text-white font-semibold rounded-xl text-sm transition-all shadow-lg flex items-center justify-center space-x-2";
+      setTimeout(() => {
+        saveToJournalBtn.innerHTML = originalText;
+        saveToJournalBtn.className = "w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-sm transition-all shadow-lg flex items-center justify-center space-x-2";
+      }, 1500);
     });
 
     const feePresets = {
@@ -354,10 +342,9 @@
     feeButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         feeButtons.forEach(b => {
-          b.className = 'fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400';
+          b.className = 'fee-btn p-2 rounded-xl border text-xs font-semibold transition-all bg-slate-800 border-slate-700 text-slate-400';
         });
-        btn.className = 'fee-btn p-2.5 rounded-xl border text-xs font-semibold transition-all bg-blue-600/25 border-blue-500 text-blue-400';
-        
+        btn.className = 'fee-btn p-2 rounded-xl border text-xs font-semibold transition-all bg-blue-600/25 border-blue-500 text-blue-400';
         const type = btn.getAttribute('data-type');
         customFeePercentEl.value = feePresets[type].percent;
         feeDescriptionEl.textContent = feePresets[type].desc;
@@ -365,7 +352,11 @@
       });
     });
 
-    customFeePercentEl.addEventListener('input', () => calculateFromBudget());
+    customFeePercentEl.addEventListener('input', () => {
+      calculateFromBudget();
+      saveToStorage();
+    });
+    journalNoteEl.addEventListener('input', saveToStorage);
 
     function updateDaysFromDates() {
       const buy = new Date(buyDateEl.value);
@@ -390,13 +381,11 @@
     }
 
     let isRateUpdating = false;
-
     couponRateEl.addEventListener('input', () => {
       if (isRateUpdating) return;
       isRateUpdating = true;
       const rate = parseFloat(couponRateEl.value) || 0;
-      const calculatedNkd = (1000 * (rate / 100)) / 365;
-      dailyNkdEl.value = calculatedNkd.toFixed(3);
+      dailyNkdEl.value = ((1000 * (rate / 100)) / 365).toFixed(3);
       calculateFromBudget();
       isRateUpdating = false;
     });
@@ -405,8 +394,7 @@
       if (isRateUpdating) return;
       isRateUpdating = true;
       const nkd = parseFloat(dailyNkdEl.value) || 0;
-      const calculatedRate = (nkd * 365 / 1000) * 100;
-      couponRateEl.value = calculatedRate.toFixed(2);
+      couponRateEl.value = ((nkd * 365 / 1000) * 100).toFixed(2);
       calculateFromBudget();
       isRateUpdating = false;
     });
@@ -416,26 +404,16 @@
     holdingDaysEl.addEventListener('input', updateSellDateFromDays);
 
     let isUpdating = false;
-
     function calculateFromBudget() {
       if (isUpdating) return;
       isUpdating = true;
-
       const budget = parseFloat(budgetInput.value) || 0;
       const price = parseFloat(buyPriceInput.value) || 0;
       const feePercent = parseFloat(customFeePercentEl.value) || 0;
-
       const costPerBondWithFee = price * (1 + feePercent / 100);
-      let count = 0;
-      if (costPerBondWithFee > 0) {
-        count = Math.floor(budget / costPerBondWithFee);
-      }
-      // Якщо бюджет менший за вартість 1 шт, але поле бюджету активно, мінімум ставимо 1 або залежно від логіки (якщо користувач навмисно зменшив)
-      if (count < 1 && budget > 0 && bondsCountInput.value == "1") {
-        count = 1;
-      }
+      let count = costPerBondWithFee > 0 ? Math.floor(budget / costPerBondWithFee) : 0;
+      if (count < 1 && budget > 0 && bondsCountInput.value == "1") count = 1;
       bondsCountInput.value = count > 0 ? count : 1;
-
       updateFinalResults(parseInt(bondsCountInput.value) || 1, budget);
       saveToStorage();
       isUpdating = false;
@@ -444,17 +422,12 @@
     function calculateFromCount() {
       if (isUpdating) return;
       isUpdating = true;
-
       const count = parseInt(bondsCountInput.value) || 0;
       const price = parseFloat(buyPriceInput.value) || 0;
       const feePercent = parseFloat(customFeePercentEl.value) || 0;
-
       const rawTotal = count * price;
-      const fee = rawTotal * (feePercent / 100);
-      const total = rawTotal + fee;
-
+      const total = rawTotal + (rawTotal * (feePercent / 100));
       budgetInput.value = total.toFixed(2);
-
       updateFinalResults(count, total);
       saveToStorage();
       isUpdating = false;
@@ -479,11 +452,8 @@
       const totalSellRevenue = count * expectedSellPrice;
       const netProfit = totalSellRevenue - totalExpenses;
       const roiPercent = totalExpenses > 0 ? (netProfit / totalExpenses) * 100 : 0;
-
       const annualizedRoi = days > 0 ? roiPercent * (365 / days) : 0;
-      
-      const depositTaxRate = 0.23; // 18% ПДФО + 5% ВЗ
-      const equivalentDepositRate = annualizedRoi > 0 ? (annualizedRoi / (1 - depositTaxRate)) : 0;
+      const equivalentDepositRate = annualizedRoi > 0 ? (annualizedRoi / (1 - 0.23)) : 0;
 
       document.getElementById('unspentAmount').textContent = unspent.toFixed(2) + ' грн';
       document.getElementById('rawPurchaseTotal').textContent = rawPurchaseTotal.toFixed(2) + ' грн';
@@ -493,31 +463,10 @@
       document.getElementById('expectedSellPrice').textContent = expectedSellPrice.toFixed(2) + ' грн';
       document.getElementById('totalSellRevenue').textContent = totalSellRevenue.toFixed(2) + ' грн';
 
-      const resultCard = document.getElementById('resultCard');
-      const resultIcon = document.getElementById('resultIcon');
-      const resultLabel = document.getElementById('resultLabel');
-      const netProfitEl = document.getElementById('netProfit');
-      const roiPercentEl = document.getElementById('roiPercent');
-      const annualizedRoiEl = document.getElementById('annualizedRoi');
-      const equivalentDepositRateEl = document.getElementById('equivalentDepositRate');
-
-      equivalentDepositRateEl.textContent = '~' + equivalentDepositRate.toFixed(2) + '% річних';
-
-      if (netProfit >= 0) {
-        resultCard.className = 'p-4 rounded-xl border flex flex-col space-y-3 bg-emerald-950/40 border-emerald-500/40 text-emerald-400 mt-4';
-        resultIcon.textContent = '📈';
-        resultLabel.textContent = 'Чистий прибуток';
-        netProfitEl.textContent = '+' + netProfit.toFixed(2) + ' грн';
-        roiPercentEl.textContent = '+' + roiPercent.toFixed(2) + '%';
-        annualizedRoiEl.textContent = '+' + annualizedRoi.toFixed(2) + '% річних';
-      } else {
-        resultCard.className = 'p-4 rounded-xl border flex flex-col space-y-3 bg-rose-950/40 border-rose-500/40 text-rose-400 mt-4';
-        resultIcon.textContent = '⚠️';
-        resultLabel.textContent = 'Чистий збиток';
-        netProfitEl.textContent = netProfit.toFixed(2) + ' грн';
-        roiPercentEl.textContent = roiPercent.toFixed(2) + '%';
-        annualizedRoiEl.textContent = annualizedRoi.toFixed(2) + '% річних';
-      }
+      document.getElementById('netProfit').textContent = (netProfit >= 0 ? '+' : '') + netProfit.toFixed(2) + ' грн';
+      document.getElementById('roiPercent').textContent = (roiPercent >= 0 ? '+' : '') + roiPercent.toFixed(2) + '%';
+      document.getElementById('annualizedRoi').textContent = (annualizedRoi >= 0 ? '+' : '') + annualizedRoi.toFixed(2) + '% річних';
+      document.getElementById('equivalentDepositRate').textContent = '~' + equivalentDepositRate.toFixed(2) + '% річних';
     }
 
     calculateFromBudget();
